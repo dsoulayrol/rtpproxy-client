@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.vtlabs</groupId>
+    <artifactId>rtpproxy-client</artifactId>
+    <name>RTPProxy Client</name>
+    <packaging>pom</packaging>
+    <version>0.1</version>
+
+    <description>Java client API to interact with RTPProxy.</description>
+
+    <modules>
+        <module>rtpproxy-client-api</module>
+        <module>rtpproxy-client-console</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.14</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.4</version>
+            <type>jar</type>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <developers>
+        <developer>
+            <id>marcoshack</id>
+            <name>Marcos Hack</name>
+            <email>marcoshack@gmail.com</email>
+            <url>http://mhack.com.br/</url>
+            <roles>
+                <role>project-owner</role>
+            </roles>
+            <timezone>-3</timezone>
+        </developer>
+    </developers>
+
+    <build>
+        <defaultGoal>install</defaultGoal>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+RTPPCC_BIN_DIR=`dirname $0`
+RTPPCC_HOME="${RTPPCC_BIN_DIR}/../"
+OPTIONS="-Dlog4j.configuration=file:$RTPPCC_HOME/conf/log4j.properties"
+
+for i in `ls -1 ${RTPPCC_HOME}/target/*.jar`; do
+  if [[ "${CLASSPATH}x" == "x" ]]; then
+    CLASSPATH=${RTPPCC_HOME}/target/$i
+  else
+    CLASSPATH=$CLASSPATH:${RTPPCC_HOME}/target/$i
+  fi
+done
+
+java -cp $CLASSPATH $OPTIONS -jar $RTPPCC_HOME/target/rtpproxy-client-console.jar $@
+
