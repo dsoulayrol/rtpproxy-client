@@ -12,7 +12,6 @@ public class RTPProxyClient {
     private UDPServer udpServer;
 
     public RTPProxyClient() {
-        udpServer = new UDPServer();
         listenerList = new ArrayList<RTPProxyEventListener>();
     }
 

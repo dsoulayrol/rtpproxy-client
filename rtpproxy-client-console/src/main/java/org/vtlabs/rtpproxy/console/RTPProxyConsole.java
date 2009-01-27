@@ -1,14 +1,15 @@
-package udpserver;
+package org.vtlabs.rtpproxy.console;
 
 import java.io.Console;
 import org.apache.log4j.Logger;
+import org.vtlabs.rtpproxy.client.UDPServer;
 
 /**
  *
  * @author Marcos Hack <marcosh@voicetechnology.com.br>
  */
-public class UDPServerConsole {
-    private static Logger logger = Logger.getLogger(UDPServerConsole.class);
+public class RTPProxyConsole {
+    private static Logger logger = Logger.getLogger(RTPProxyConsole.class);
 
     public static void main(String[] args) {
         try {
