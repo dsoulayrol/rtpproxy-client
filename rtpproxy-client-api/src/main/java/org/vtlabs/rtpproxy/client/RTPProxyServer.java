@@ -1,18 +1,19 @@
 package org.vtlabs.rtpproxy.client;
 
+import java.net.InetSocketAddress;
+
 /**
  *
  * @author Marcos Hack <marcosh@voicetechnology.com.br>
  */
 public class RTPProxyServer {
+    private InetSocketAddress address;
 
-    private String serverIpAddress;
-    private Integer serverPort;
-    private Long capacity;
+    public InetSocketAddress getAddress() {
+        return address;
+    }
 
-    public RTPProxyServer(String serverIpAddress, Integer serverPort, Long capacity) {
-        this.serverIpAddress = serverIpAddress;
-        this.serverPort = serverPort;
-        this.capacity = capacity;
+    public void setAddress(InetSocketAddress address) {
+        this.address = address;
     }
 }

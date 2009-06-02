@@ -2,7 +2,7 @@ package org.vtlabs.rtpproxy.console;
 
 import java.io.Console;
 import org.apache.log4j.Logger;
-import org.vtlabs.rtpproxy.client.UDPServer;
+import org.vtlabs.rtpproxy.client.UDPService;
 
 /**
  *
@@ -15,7 +15,7 @@ public class RTPProxyConsole {
         try {
             Thread.currentThread().setName("UDPServerConsole");
             
-            UDPServer udpServer = new UDPServer();
+            UDPService udpServer = new UDPService();
             udpServer.start();
 
             Console console = System.console();
