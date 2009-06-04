@@ -16,6 +16,7 @@ import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 
 /**
  *
+ * @author Marcos Hack <marcosh@voicetechnology.com.br>
  */
 public class DatagramService {
 

@@ -5,6 +5,7 @@
 package org.vtlabs.rtpproxy.udp;
 
 import java.net.InetSocketAddress;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
@@ -31,10 +32,12 @@ public class DatagramHandler extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession session, Object objectMessage)
             throws Exception {
-
-        String message = objectMessage.toString();
+        String responseLine = objectMessage.toString();
+        String arrCookieMessage[] = StringUtils.split(responseLine, " ", 2);
+        String cookie = arrCookieMessage[0];
+        String message = arrCookieMessage[1];
         InetSocketAddress srcAddr = (InetSocketAddress) session.getRemoteAddress();
-
         
+        listener.processResponse(cookie, message, srcAddr);
     }
 }

@@ -1,0 +1,35 @@
+== U[args] callid addr port from_tag to_tag ==
+
+Update sesssion, creating a new one if it doesn't exist.
+
+== L[args] callid addr port from_tag to_tag ==
+
+Lookup existing session (in reverse direction), update if necessary.
+
+== D callid from_tag to_tag ==
+
+Delete session.
+
+== P[args] callid play_name codecs from_tag to_tag ==
+
+Start playback.
+
+== S callid from_tag to_tag ==
+
+Stop playback.
+
+== R callid from_tag to_tag ==
+
+Start recording.
+
+== C callid recording_name from_tag to_tag ==
+
+Start recording to the specified destination.
+
+== V[args] ==
+
+Get version of RTPproxy, check capabilities.
+
+== I ==
+
+Get statistics for all sessions.

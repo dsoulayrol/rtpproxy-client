@@ -1,19 +1,17 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.vtlabs.rtpproxy.callback;
 
 import java.net.InetSocketAddress;
+import org.vtlabs.rtpproxy.client.RTPProxyClientListener;
 import org.vtlabs.rtpproxy.command.Command;
 import org.vtlabs.rtpproxy.command.CommandListener;
 import org.vtlabs.rtpproxy.command.CommandTimeoutManager;
-import org.vtlabs.rtpproxy.command.CreateSessionCommand;
+import org.vtlabs.rtpproxy.command.UpdateCommand;
 import org.vtlabs.rtpproxy.udp.DatagramListener;
 
 /**
+ * Handler of RTPProxy responses and notify RTPProxyClientListener.
  *
- * @author mhack
+ * @author Marcos Hack <marcosh@voicetechnology.com.br>
  */
 public class CallbackHandler implements DatagramListener, CommandListener {
 
@@ -24,7 +22,7 @@ public class CallbackHandler implements DatagramListener, CommandListener {
     }
 
     /**
-     * Callback method of datagram responses.
+     * Callback method for received datagram messages (DatagramListener).
      *
      * @param Command cookie
      * @param Response message
@@ -34,20 +32,46 @@ public class CallbackHandler implements DatagramListener, CommandListener {
             InetSocketAddress srcAddr) {
         Command command = commandManager.removePendingCommand(cookie);
 
-        if (command instanceof CreateSessionCommand) {
-            processCreateSessionResponse(command, message);
+        if (command instanceof UpdateCommand) {
+            UpdateCommand updateCommand = (UpdateCommand)command;
+            
+            if (updateCommand.getSession() == null) {
+                processSessionCreated(command, message);
+
+            } else {
+                processSessionUpdated(command, message);
+            }
         }
-    }
-    
-    protected void processCreateSessionResponse(Command command, String msg) {
     }
 
     /**
-     * Command timeout callback method.
+     * 
+     * @param command
+     * @param msg
+     */
+    protected void processSessionCreated(Command command, String msg) {
+
+
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    /**
+     *
+     * @param command
+     * @param message
+     */
+    private void processSessionUpdated(Command command, String message) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+    
+    /**
+     * Command timeout callback method (CommandListener).
      *
      * @param Command that reached the timeout period.
      */
-    public void commandTimeout(Command c) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void commandTimeout(Command command) {
+        RTPProxyClientListener listener = command.getCallbackListener();
+        listener.createSessionTimeout(command.getSessionID(),
+                command.getAppData());
     }
 }
