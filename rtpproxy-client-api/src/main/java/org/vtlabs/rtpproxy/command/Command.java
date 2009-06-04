@@ -6,6 +6,7 @@
 package org.vtlabs.rtpproxy.command;
 
 import java.util.UUID;
+import org.vtlabs.rtpproxy.client.RTPProxyClientListener;
 
 /**
  *
@@ -14,6 +15,7 @@ import java.util.UUID;
 public abstract class Command {
     private Object appData;
     private String cookie;
+    private RTPProxyClientListener listener;
 
     public Command() {
         UUID uuid = UUID.randomUUID();
@@ -24,5 +26,13 @@ public abstract class Command {
 
     public String getCookie() {
         return cookie;
+    }
+
+    public RTPProxyClientListener getListener() {
+        return listener;
+    }
+
+    public void setListener(RTPProxyClientListener listener) {
+        this.listener = listener;
     }
 }

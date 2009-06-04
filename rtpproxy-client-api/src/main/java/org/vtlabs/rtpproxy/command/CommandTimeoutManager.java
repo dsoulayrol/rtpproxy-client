@@ -12,19 +12,19 @@ import java.util.List;
  *
  * @author mhack
  */
-public class CommandManager {
+public class CommandTimeoutManager {
     private HashMap<String, Command> pendingCommandMap;
     private List<CommandListener> listeners;
     
-    public CommandManager() {
+    public CommandTimeoutManager() {
         pendingCommandMap = new HashMap<String, Command>();
     }
 
-    public void addPendingCommand(Command c) {
-        // TODO add command timeout
+    public void addPendingCommand(Command command) {
+        // TODO add command timeout using java.util.concurrent.Executor.
 
         synchronized (pendingCommandMap) {
-            pendingCommandMap.put(c.getCookie(), c);
+            pendingCommandMap.put(command.getCookie(), command);
         }
     }
 
@@ -36,15 +36,15 @@ public class CommandManager {
         }
     }
 
-    public void addListener(CommandListener l) {
+    public void addListener(CommandListener listener) {
         synchronized(listeners) {
-            listeners.add(l);
+            listeners.add(listener);
         }
     }
 
-    public void removeListener(CommandListener l) {
+    public void removeListener(CommandListener listener) {
         synchronized(listeners) {
-            listeners.remove(l);
+            listeners.remove(listener);
         }
     }
 }
