@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 public class DatagramHandlerTest extends BaseTest {
 
     @Test
-    public void processResponse() throws Exception {
+    public void messageReceived() throws Exception {
         DatagramListenerMOCK listener = new DatagramListenerMOCK();
         SocketAddress srcAddr = new InetSocketAddress("127.0.0.1", 9999);
         IoSessionMOCK session = new IoSessionMOCK(srcAddr);

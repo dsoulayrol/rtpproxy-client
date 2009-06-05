@@ -34,6 +34,10 @@ public abstract class Command {
         return cookie;
     }
 
+    public void setCookie(String cookie) {
+        this.cookie = cookie;
+    }
+
     public RTPProxyClientListener getCallbackListener() {
         return listener;
     }

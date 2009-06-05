@@ -2,6 +2,7 @@ package org.vtlabs.rtpproxy.callback;
 
 import java.net.InetSocketAddress;
 import org.vtlabs.rtpproxy.client.RTPProxyClientListener;
+import org.vtlabs.rtpproxy.client.RTPProxySession;
 import org.vtlabs.rtpproxy.command.Command;
 import org.vtlabs.rtpproxy.command.CommandListener;
 import org.vtlabs.rtpproxy.command.CommandTimeoutManager;
@@ -33,14 +34,27 @@ public class CallbackHandler implements DatagramListener, CommandListener {
         Command command = timeoutManager.removePendingCommand(cookie);
 
         if (command instanceof UpdateCommand) {
-            UpdateCommand updateCommand = (UpdateCommand)command;
-            
-            if (updateCommand.getSession() == null) {
-                processSessionCreated(command, message);
-                
-            } else {
-                processSessionUpdated(command, message);
-            }
+            processUpdateCommand((UpdateCommand)command,message);
+
+        } else {
+            processUnknownCommand(command, message);
+        }
+    }
+
+    /**
+     * Handle Update command callback.
+     *
+     * @param command that originated this callback message
+     * @param callback message received from RTPPRoxy server
+     */
+    protected void processUpdateCommand(UpdateCommand command, String message) {
+        RTPProxySession session = command.getSession();
+
+        if (session == null) {
+            processSessionCreated(command, message);
+
+        } else {
+            processSessionUpdated(command, message);
         }
     }
 
@@ -49,7 +63,7 @@ public class CallbackHandler implements DatagramListener, CommandListener {
      * @param command
      * @param msg
      */
-    protected void processSessionCreated(Command command, String msg) {
+    protected void processSessionCreated(Command command, String message) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
@@ -58,10 +72,19 @@ public class CallbackHandler implements DatagramListener, CommandListener {
      * @param command
      * @param message
      */
-    private void processSessionUpdated(Command command, String message) {
+    protected void processSessionUpdated(Command command, String message) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
-    
+
+    /**
+     * 
+     * @param command
+     * @param message
+     */
+    protected void processUnknownCommand(Command command, String message) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
     /**
      * Command timeout callback method (CommandListener).
      *

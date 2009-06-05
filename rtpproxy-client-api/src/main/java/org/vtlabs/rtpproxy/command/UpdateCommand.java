@@ -8,7 +8,6 @@ import org.vtlabs.rtpproxy.client.RTPProxySession;
  * @author Marcos Hack <marcosh@voicetechnology.com.br>
  */
 public class UpdateCommand extends Command {
-
     private RTPProxySession session;
     private String callID;
     private String address;
