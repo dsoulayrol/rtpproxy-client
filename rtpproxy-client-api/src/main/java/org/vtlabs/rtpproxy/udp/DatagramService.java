@@ -3,7 +3,6 @@ package org.vtlabs.rtpproxy.udp;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
-import org.apache.log4j.Logger;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoSession;
@@ -13,6 +12,8 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.nio.DatagramAcceptor;
 import org.apache.mina.transport.socket.nio.DatagramAcceptorConfig;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -20,7 +21,7 @@ import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
  */
 public class DatagramService {
 
-    private Logger log = Logger.getLogger(DatagramService.class);
+    private Logger log = LoggerFactory.getLogger(DatagramService.class);
     private DatagramAcceptor acceptor;
     private DatagramHandler handler;
     private int bindPort;

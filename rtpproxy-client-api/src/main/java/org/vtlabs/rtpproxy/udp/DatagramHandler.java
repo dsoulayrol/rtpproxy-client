@@ -6,9 +6,10 @@ package org.vtlabs.rtpproxy.udp;
 
 import java.net.InetSocketAddress;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -16,7 +17,7 @@ import org.apache.mina.common.IoSession;
  */
 public class DatagramHandler extends IoHandlerAdapter {
 
-    private Logger log = Logger.getLogger(DatagramHandler.class);
+    private Logger log = LoggerFactory.getLogger(DatagramHandler.class);
     
     private DatagramListener listener;
 
