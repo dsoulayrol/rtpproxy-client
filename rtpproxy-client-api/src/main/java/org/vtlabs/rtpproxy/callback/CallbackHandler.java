@@ -15,10 +15,10 @@ import org.vtlabs.rtpproxy.udp.DatagramListener;
  */
 public class CallbackHandler implements DatagramListener, CommandListener {
 
-    private CommandTimeoutManager commandManager;
+    private CommandTimeoutManager timeoutManager;
 
     public CallbackHandler(CommandTimeoutManager commandManager) {
-        this.commandManager = commandManager;
+        this.timeoutManager = commandManager;
     }
 
     /**
@@ -30,14 +30,14 @@ public class CallbackHandler implements DatagramListener, CommandListener {
      */
     public void processResponse(String cookie, String message,
             InetSocketAddress srcAddr) {
-        Command command = commandManager.removePendingCommand(cookie);
+        Command command = timeoutManager.removePendingCommand(cookie);
 
         if (command instanceof UpdateCommand) {
             UpdateCommand updateCommand = (UpdateCommand)command;
             
             if (updateCommand.getSession() == null) {
                 processSessionCreated(command, message);
-
+                
             } else {
                 processSessionUpdated(command, message);
             }
@@ -50,8 +50,6 @@ public class CallbackHandler implements DatagramListener, CommandListener {
      * @param msg
      */
     protected void processSessionCreated(Command command, String msg) {
-
-
         throw new UnsupportedOperationException("Not yet implemented");
     }
 

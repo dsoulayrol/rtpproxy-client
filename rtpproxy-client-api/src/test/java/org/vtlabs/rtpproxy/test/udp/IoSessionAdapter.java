@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.vtlabs.rtpproxy.udp.test;
+package org.vtlabs.rtpproxy.test.udp;
 
 import java.net.SocketAddress;
 import java.util.Set;

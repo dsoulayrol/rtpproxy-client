@@ -1,4 +1,4 @@
-package org.vtlabs.rtpproxy.udp.test;
+package org.vtlabs.rtpproxy.test.udp;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
