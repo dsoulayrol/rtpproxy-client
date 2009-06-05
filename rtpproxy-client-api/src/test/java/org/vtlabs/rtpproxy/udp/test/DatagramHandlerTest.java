@@ -26,33 +26,21 @@ public class DatagramHandlerTest extends BaseTest {
         DatagramHandler handler = new DatagramHandler(listener);
         handler.messageReceived(session, messageLine);
 
-        assertEquals("Invalid cookie", cookie, listener.getCookie());
-        assertEquals("Invalid message", message, listener.getMessage());
-        assertEquals("Invalid source address", srcAddr, listener.getSrcAddr());
+        assertEquals("Invalid cookie", cookie, listener.cookie);
+        assertEquals("Invalid message", message, listener.message);
+        assertEquals("Invalid source address", srcAddr, listener.srcAddr);
     }
 
     protected class DatagramListenerMOCK implements DatagramListener {
-        String cookie;
-        String message;
-        InetSocketAddress srcAddr;
+        public String cookie;
+        public String message;
+        public InetSocketAddress srcAddr;
 
         public void processResponse(String cookie, String message,
                 InetSocketAddress srcAddr) {
             this.cookie = cookie;
             this.message = message;
             this.srcAddr = srcAddr;
-        }
-
-        public String getCookie() {
-            return cookie;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public InetSocketAddress getSrcAddr() {
-            return srcAddr;
         }
     }
 

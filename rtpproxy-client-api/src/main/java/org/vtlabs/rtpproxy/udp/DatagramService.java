@@ -34,7 +34,21 @@ public class DatagramService {
         init();
     }
 
-    public void init() throws IOException {
+    public void stop() throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void send(String cookie, String message, InetSocketAddress dstAddr) {
+        InetSocketAddress localAddr = new InetSocketAddress(bindPort);
+        IoSession session = acceptor.newSession(dstAddr, localAddr);
+
+        // Create message in the format "COOKIE MESSAGE"
+        StringBuilder sbMessage = new StringBuilder(cookie);
+        sbMessage.append(" ").append(message);
+        send(sbMessage.toString(), session);
+    }
+    
+    protected void init() throws IOException {
         ByteBuffer.setUseDirectBuffers(false);
         ByteBuffer.setAllocator(new SimpleByteBufferAllocator());
 
@@ -50,22 +64,40 @@ public class DatagramService {
         DatagramSessionConfig sessionConfig = acceptorConfig.getSessionConfig();
         sessionConfig.setReuseAddress(true);
 
-        acceptor.bind(new InetSocketAddress(bindPort), handler);
+        bind(new InetSocketAddress(bindPort), handler);
     }
 
-    public void stop() throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    /**
+     * Bind DatagramService to the given bindAddr and configure handler as the
+     * IoHandler of the DatagramAcceptor.
+     * 
+     * @param bindAddr
+     * @param handler
+     * @throws java.io.IOException
+     */
+    protected void bind(InetSocketAddress bindAddr, DatagramHandler handler)
+            throws IOException {
+        acceptor.bind(bindAddr, handler);
     }
 
-    public void send(String cookie, String message, InetSocketAddress dstAddr) {
-        InetSocketAddress localAddr = new InetSocketAddress(bindPort);
-        IoSession session = acceptor.newSession(dstAddr, localAddr);
-
-        // Create message in the format "COOKIE MESSAGE"
-        StringBuilder sbMessage = new StringBuilder(cookie);
-        sbMessage.append(" ").append(message);
-
-        session.write(sbMessage.toString());
+    /**
+     * Send text message using the given IoSession.
+     *
+     * This method is just to get easy to unit test DatagramService class as
+     * we're unable to MOCK DatagramAcceptor class.
+     * 
+     * @param message
+     * @param session
+     */
+    protected void send(String message, IoSession session) {
+        if (log.isDebugEnabled()) {
+            StringBuilder sb = new StringBuilder("Sending message \'");
+            sb.append(message);
+            sb.append("\' to ").append(session.getRemoteAddress());
+            log.debug(sb.toString());
+        }
+        
+        session.write(message);
         session.close();
     }
 
