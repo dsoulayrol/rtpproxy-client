@@ -33,11 +33,20 @@ public class DatagramHandler extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession session, Object objectMessage)
             throws Exception {
+
         String responseLine = objectMessage.toString();
         String arrCookieMessage[] = StringUtils.split(responseLine, " ", 2);
         String cookie = arrCookieMessage[0];
         String message = arrCookieMessage[1];
         InetSocketAddress srcAddr = (InetSocketAddress) session.getRemoteAddress();
+
+        if (log.isDebugEnabled()) {
+            StringBuilder sb = new StringBuilder("Message received from ");
+            sb.append(srcAddr);
+            sb.append(": cookie = \'").append(cookie).append("\'");
+            sb.append(", message = \'").append(message).append("\'");
+            log.debug(sb.toString());
+        }
         
         listener.processResponse(cookie, message, srcAddr);
     }

@@ -28,9 +28,9 @@ public class DatagramService {
 
     public DatagramService(int bindPort, DatagramListener listener)
             throws IOException {
-        acceptor = new DatagramAcceptor();
+        acceptor = createDatagramAcceptor();
+        handler = createDatagramHandler(listener);
         this.bindPort = bindPort;
-        handler = new DatagramHandler(listener);
         init();
     }
 
@@ -60,12 +60,33 @@ public class DatagramService {
     public void send(String cookie, String message, InetSocketAddress dstAddr) {
         InetSocketAddress localAddr = new InetSocketAddress(bindPort);
         IoSession session = acceptor.newSession(dstAddr, localAddr);
-        
+
         // Create message in the format "COOKIE MESSAGE"
         StringBuilder sbMessage = new StringBuilder(cookie);
         sbMessage.append(" ").append(message);
 
         session.write(sbMessage.toString());
         session.close();
+    }
+
+    /**
+     * Factory method to create the DatagramAcceptor.
+     *
+     * @return DatagramAcceptor
+     */
+    protected DatagramAcceptor createDatagramAcceptor() {
+        return new DatagramAcceptor();
+    }
+
+    /**
+     * Factory method to create the DatagramHandler to handle the
+     * DatagramAcceptor IO events and notity the DatagramListener using its
+     * callback methods.
+     *
+     * @param Listener to received RTPProxy server callback events.
+     * @return DatagramHandler
+     */
+    private DatagramHandler createDatagramHandler(DatagramListener listener) {
+        return new DatagramHandler(listener);
     }
 }
