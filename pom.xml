@@ -12,7 +12,7 @@
 
     <modules>
         <module>rtpproxy-client-api</module>
-        <module>rtpproxy-client-console</module>
+        <module>rtpproxy-client-test</module>
     </modules>
 
     <dependencies>
