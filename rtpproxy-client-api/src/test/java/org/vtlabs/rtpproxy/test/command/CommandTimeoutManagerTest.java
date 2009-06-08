@@ -7,11 +7,13 @@ package org.vtlabs.rtpproxy.test.command;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import org.junit.Ignore;
 
 /**
  *
  * @author mhack
  */
+@Ignore
 public class CommandTimeoutManagerTest {
 
     protected class ScheduledThreadPoolMOCK

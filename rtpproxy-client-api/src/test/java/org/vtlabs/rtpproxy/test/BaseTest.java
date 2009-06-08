@@ -8,6 +8,8 @@ package org.vtlabs.rtpproxy.test;
 import org.apache.log4j.BasicConfigurator;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -15,9 +17,11 @@ import org.junit.Ignore;
  */
 @Ignore
 public class BaseTest {
+    protected static Logger log;
 
     @BeforeClass
     public static void classInit() {
         BasicConfigurator.configure();
+        log = LoggerFactory.getLogger(BaseTest.class);
     }
 }

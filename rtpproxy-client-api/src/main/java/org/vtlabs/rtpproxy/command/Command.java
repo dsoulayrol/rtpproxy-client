@@ -7,6 +7,7 @@ package org.vtlabs.rtpproxy.command;
 
 import java.util.UUID;
 import org.vtlabs.rtpproxy.client.RTPProxyClientListener;
+import org.vtlabs.rtpproxy.client.RTPProxyServer;
 
 /**
  *
@@ -18,6 +19,7 @@ public abstract class Command {
     private String cookie;
     private RTPProxyClientListener listener;
     private CommandListener cmdListener;
+    private RTPProxyServer server;
 
     public Command() {
         UUID uuid = UUID.randomUUID();
@@ -72,5 +74,23 @@ public abstract class Command {
 
     public void setSessionID(String sessionID) {
         this.sessionID = sessionID;
+    }
+
+    public RTPProxyServer getServer() {
+        return server;
+    }
+
+    public void setServer(RTPProxyServer server) {
+        this.server = server;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("Command[");
+        sb.append("commandType = ").append(this.getClass().getName());
+        sb.append(", sessionID = ").append(getSessionID());
+        sb.append(", cookie = ").append(getCookie());
+        sb.append("]");
+        return sb.toString();
     }
 }
