@@ -4,11 +4,10 @@
  */
 package org.vtlabs.rtpproxy.client;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
 
@@ -18,100 +17,91 @@ import org.apache.commons.lang.StringUtils;
  */
 public class RTPProxyClientConfigurator {
 
-    private static final String CONFIG_PROPERTY = "org.vtlabs.rtpproxy.config";
-    private static final String BIND_PORT_PROPERTY = "org.vtlabs.rtpproxy.bindport";
-    private static final String SERVER_LIST_PROPERTY = "org.vtlabs.rtpproxy.servers";
-    private static final String POOL_SIZE_PROPERTY = "org.vtlabs.rtpproxy.poolsize";
+    public static final String CONFIG_PROPERTY = "org.vtlabs.rtpproxy.config";
+    public static final String BIND_PORT_PROPERTY = "org.vtlabs.rtpproxy.bindport";
+    public static final String SERVER_LIST_PROPERTY = "org.vtlabs.rtpproxy.servers";
+    public static final String POOL_SIZE_PROPERTY = "org.vtlabs.rtpproxy.poolsize";
 
-    /**
-     * Default bind port used by UDP service if it isn't specified.
-     */
-    public static final int DEFAULT_BIND_PORT = 9876;
-
-    /**
-     * Default scheduled thread pool executor pool size, used by the command
-     * timeout service.
-     */
-    public static final int DEFAULT_SCHEDULED_POOL_SIZE = 3;
-
-    private int bindPort;
-    private int poolSize;
-    private List<RTPProxyServer> serverList;
+    private RTPProxyClientConfigurator() {}
     
-    public RTPProxyClientConfigurator() throws ConfigErrorException {
-        String configFileName = System.getProperty(CONFIG_PROPERTY);
-
-        if (configFileName == null) {
-            throw new ConfigErrorException("Configuration file name not found. " 
-                    + "Set " + CONFIG_PROPERTY + " property with the "
-                    + "configuration file path");
-        }
-
+    public static RTPProxyClientConfig load(File configFile)
+            throws RTPProxyClientConfigException {
         try {
-            FileReader reader = new FileReader(configFileName);
+            FileReader reader = new FileReader(configFile);
             Properties configProperties = new Properties();
             configProperties.load(reader);
 
-            loadConfig(configProperties);
+            return load(configProperties);
 
         } catch (IOException ioEx) {
-            throw new ConfigErrorException("Unable to read config file " 
-                    + configFileName, ioEx);
+            StringBuilder sb = new StringBuilder("Unable to read config file ");
+            sb.append(configFile.getAbsolutePath());
+            throw new RTPProxyClientConfigException(sb.toString(), ioEx);
 
-        } catch (Exception e) {
-            throw new ConfigErrorException("Error reading config file "
-                    + configFileName, e);
         }
     }
 
-    private void loadConfig(Properties prop) throws ConfigErrorException {
+    /**
+     * Create RTPProxyClient configuration from a comma separated list of
+     * RTPProxy server addresses in the format SERVER_IP:PORT. Assume default
+     * values for the other properties.
+     *
+     * @return Client config.
+     */
+    public static RTPProxyClientConfig load(String serverList)
+            throws RTPProxyClientConfigException {
+        Properties configProps = new Properties();
+        configProps.setProperty(SERVER_LIST_PROPERTY, serverList);
+        return load(configProps);
+    }
+
+    /**
+     * Create RTPProxyClient configuration from the given properties. Assume
+     * default values for BIND_PORT and POOL_SIZE. SERVER_LIST is obrigatory.
+     * @param Properties containing at leat SERVER_LIST property set.
+     * @return RTPProxyClient configuration.
+     * @throws org.vtlabs.rtpproxy.client.RTPProxyClientConfigException
+     */
+    public static RTPProxyClientConfig load(Properties propList)
+            throws RTPProxyClientConfigException {
+        RTPProxyClientConfig config = new RTPProxyClientConfig();
         // Bind port
-        String strBindPort = prop.getProperty(BIND_PORT_PROPERTY);
-        if (strBindPort == null) {
-            bindPort = DEFAULT_BIND_PORT;
-        } else {
-            bindPort = Integer.parseInt(strBindPort);
+        String strBindPort = propList.getProperty(BIND_PORT_PROPERTY);
+        if (strBindPort != null) {
+            int bindPort = Integer.parseInt(strBindPort);
+            config.setBindPort(bindPort);
         }
 
         // Scheduled Thread Pool Size
-        String strPoolSize = prop.getProperty(POOL_SIZE_PROPERTY);
-        if (strPoolSize == null) {
-            poolSize = DEFAULT_SCHEDULED_POOL_SIZE;
-        } else {
-            poolSize = Integer.parseInt(strPoolSize);
+        String strPoolSize = propList.getProperty(POOL_SIZE_PROPERTY);
+        if (strPoolSize != null) {
+            int poolSize = Integer.parseInt(strPoolSize);
+            config.setPoolSize(poolSize);
         }
 
         // Server List
-        String strServers = prop.getProperty(SERVER_LIST_PROPERTY);
+        String strServers = propList.getProperty(SERVER_LIST_PROPERTY);
         if (strServers == null) {
-            throw new ConfigErrorException("Server list is empty. Set property "
-                    + SERVER_LIST_PROPERTY + " as a comma sparated list of "
-                    + "RTPProxy servers");
+            StringBuilder sb = new StringBuilder("Server list is empty.");
+            sb.append(" Set property ").append(SERVER_LIST_PROPERTY);
+            sb.append(" as a comma separated list of RTPProxy servers");
+            sb.append(" IP addresses");
+            throw new RTPProxyClientConfigException(sb.toString());
+
         } else {
             String[] arrServers = StringUtils.split(strServers, ",");
-            serverList = new ArrayList<RTPProxyServer>();
             for (String strServerAddr : arrServers) {
                 // Split HOSTNAME:PORT
-                String[] arrServerAddr = StringUtils.split(strServerAddr,":",2);
-                String host = arrServerAddr[0];
-                int port = Integer.parseInt(arrServerAddr[1]);
+                String[] arrAddr = StringUtils.split(strServerAddr, ":", 2);
+                String host = arrAddr[0];
+                int port = Integer.parseInt(arrAddr[1]);
                 InetSocketAddress address = new InetSocketAddress(host, port);
                 RTPProxyServer server = new RTPProxyServer();
                 server.setAddress(address);
-                serverList.add(server);
+                config.addServer(server);
             }
         }
-    }
 
-    public int getBindPort() {
-        return bindPort;
-    }
-
-    public int getScheduledThreadPoolSize() {
-        return poolSize;
-    }
-
-    public List<RTPProxyServer> getServerList() {
-        return serverList;
+        return config;
     }
 }

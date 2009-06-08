@@ -21,16 +21,15 @@ public class RTPProxyClient {
     private DatagramService udpService;
     private CallbackHandler callbackHandler;
     private ScheduledThreadPoolExecutor executor;
-    private RTPProxyClientConfigurator config;
-    private List<RTPProxyServer> serverList;
+    private RTPProxyClientConfig config;
 
-    public RTPProxyClient() throws IOException, ConfigErrorException {
-        config = createClientConfigurator();
-        executor = createThreadPoolExecutor(config.getScheduledThreadPoolSize());
+    public RTPProxyClient(RTPProxyClientConfig config)
+            throws IOException, RTPProxyClientConfigException {
+        this.config = config;
+        executor = createThreadPoolExecutor(config.getPoolSize());
         commandTimeout = createCommandTimeoutManager(executor);
         callbackHandler = createCallbackHandler(commandTimeout);
         udpService = createDatagraService(config.getBindPort(), callbackHandler);
-        serverList = config.getServerList();
     }
 
     /**
@@ -94,6 +93,16 @@ public class RTPProxyClient {
      */
     public void destroySession(RTPProxySession session, Object appData,
             RTPProxyClientListener listener) throws NoServerAvailableException {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /**
+     * Get RTPProxyClient configuration.
+     *
+     * @return Client configuration.
+     */
+    public RTPProxyClientConfig getConfig() {
+        return config;
     }
 
     /**
@@ -105,6 +114,8 @@ public class RTPProxyClient {
      */
     protected RTPProxyServer getServer() throws NoServerAvailableException {
         // TODO [marcoshack] RTPProxy servers load balance algorithm
+        List<RTPProxyServer> serverList = config.getServerList();
+
         if (serverList.size() > 0) {
             return serverList.get(0);
         } else {
@@ -150,15 +161,5 @@ public class RTPProxyClient {
     protected ScheduledThreadPoolExecutor createThreadPoolExecutor(
             int poolSize) {
         return new ScheduledThreadPoolExecutor(poolSize);
-    }
-
-    /**
-     * Factory method to create RTPProxyClientConfigurator.
-     *
-     * @return
-     */
-    protected RTPProxyClientConfigurator createClientConfigurator() 
-            throws ConfigErrorException {
-        return new RTPProxyClientConfigurator();
     }
 }

@@ -8,13 +8,13 @@ package org.vtlabs.rtpproxy.client;
  *
  * @author mhack
  */
-public class ConfigErrorException extends Exception {
+public class RTPProxyClientConfigException extends Exception {
 
-    public ConfigErrorException(String message) {
+    public RTPProxyClientConfigException(String message) {
         super(message);
     }
 
-    public ConfigErrorException(String message, Throwable t) {
+    public RTPProxyClientConfigException(String message, Throwable t) {
         super(message, t);
     }
 }
