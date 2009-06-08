@@ -35,8 +35,7 @@ public class UpdateCommand extends Command {
      */
     @Override
     public String getMessage() {
-        StringBuilder sb = new StringBuilder(getCookie());
-        sb.append(" U ").append(callID);
+        StringBuilder sb = new StringBuilder("U ").append(callID);
         sb.append(" ").append(address != null ? address : 0);
         sb.append(" ").append(port != null ? port : 0);
         sb.append(" ").append(fromTag != null ? fromTag : 0);

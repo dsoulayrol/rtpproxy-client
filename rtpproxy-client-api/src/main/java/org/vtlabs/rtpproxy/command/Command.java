@@ -27,8 +27,8 @@ public abstract class Command {
     }
 
     /**
-     * Text representation of the command as defined in the RTPPRoxy
-     * protocol.
+     * Text representation of the command without the COOKIE prefix, as defined
+     * in the RTPPRoxy.
      */
     public abstract String getMessage();
 

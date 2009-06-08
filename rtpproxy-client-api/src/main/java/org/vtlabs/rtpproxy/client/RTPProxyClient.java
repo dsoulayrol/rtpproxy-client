@@ -17,11 +17,11 @@ import org.vtlabs.rtpproxy.udp.DatagramService;
  */
 public class RTPProxyClient {
 
-    private CommandTimeoutManager commandTimeout;
-    private DatagramService udpService;
-    private CallbackHandler callbackHandler;
-    private ScheduledThreadPoolExecutor executor;
-    private RTPProxyClientConfig config;
+    protected CommandTimeoutManager commandTimeout;
+    protected DatagramService udpService;
+    protected CallbackHandler callbackHandler;
+    protected ScheduledThreadPoolExecutor executor;
+    protected RTPProxyClientConfig config;
 
     public RTPProxyClient(RTPProxyClientConfig config)
             throws IOException, RTPProxyClientConfigException {
@@ -58,6 +58,8 @@ public class RTPProxyClient {
         String cookie = updateCmd.getCookie();
         String message = updateCmd.getMessage();
         InetSocketAddress serverAddr = getServer().getAddress();
+
+        commandTimeout.addPendingCommand(updateCmd);
         udpService.send(cookie, message, serverAddr);
     }
 
@@ -82,6 +84,8 @@ public class RTPProxyClient {
         String cookie = updateCmd.getCookie();
         String message = updateCmd.getMessage();
         InetSocketAddress serverAddr = session.getServer().getAddress();
+
+        commandTimeout.addPendingCommand(updateCmd);
         udpService.send(cookie, message, serverAddr);
     }
 
@@ -119,7 +123,7 @@ public class RTPProxyClient {
         if (serverList.size() > 0) {
             return serverList.get(0);
         } else {
-            throw new NoServerAvailableException("No RTPProxy server available");
+            throw new NoServerAvailableException("Server list is empty");
         }
     }
     

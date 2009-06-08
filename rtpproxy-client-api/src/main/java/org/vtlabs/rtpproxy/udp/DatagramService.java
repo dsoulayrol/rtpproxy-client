@@ -118,7 +118,7 @@ public class DatagramService {
      * @param Listener to received RTPProxy server callback events.
      * @return DatagramHandler
      */
-    private DatagramHandler createDatagramHandler(DatagramListener listener) {
+    protected DatagramHandler createDatagramHandler(DatagramListener listener) {
         return new DatagramHandler(listener);
     }
 }
