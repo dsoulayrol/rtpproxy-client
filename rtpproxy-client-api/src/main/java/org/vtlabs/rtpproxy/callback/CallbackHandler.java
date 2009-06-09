@@ -70,6 +70,12 @@ public class CallbackHandler implements DatagramListener, CommandListener {
      * @param callback message received from RTPPRoxy server
      */
     protected void processUpdateCommand(UpdateCommand command, String message) {
+        if (log.isDebugEnabled()) {
+            StringBuilder sb = new StringBuilder("Processing Update Command: ");
+            sb.append(command);
+            log.debug(sb.toString());
+        }
+
         RTPProxySession session = command.getSession();
         boolean isError = errorMatcher.reset(message).matches();
 
@@ -101,6 +107,8 @@ public class CallbackHandler implements DatagramListener, CommandListener {
      */
     protected void processSessionCreateFailed(UpdateCommand command,
             String message) {
+        log.debug("Processing event SessionCreateFailed");
+
         StringBuilder sb = new StringBuilder();
         sb.append("Error creating a RTPProxy session: ");
         sb.append("\'").append(message).append("\'");
@@ -119,12 +127,20 @@ public class CallbackHandler implements DatagramListener, CommandListener {
      * @param Response message
      */
     protected void processSessionCreated(UpdateCommand command, String message) {
+        log.debug("Processing event SessionCreated");
+
         RTPProxySession session = new RTPProxySession();
         session.setSessionID(command.getSessionID());
         session.setServer(command.getServer());
 
         InetSocketAddress calleeMediaAddr = parseMediaAddress(message);
         session.setCalleeMediaAddress(calleeMediaAddr);
+
+        if (log.isDebugEnabled()) {
+            StringBuilder sb = new StringBuilder("Callee media address ");
+            sb.append(calleeMediaAddr);
+            log.debug(sb.toString());
+        }
 
         RTPProxyClientListener callbackListener = command.getCallbackListener();
         callbackListener.sessionCreated(session, command.getAppData());
@@ -138,6 +154,8 @@ public class CallbackHandler implements DatagramListener, CommandListener {
      */
     protected void processSessionUpdateFailed(UpdateCommand command,
             String message) {
+        log.debug("Processing event SessionUpdateFailed");
+
         StringBuilder sb = new StringBuilder();
         sb.append("Error updating RTPProxy session: ");
         sb.append("\'").append(message).append("\'");
@@ -154,6 +172,8 @@ public class CallbackHandler implements DatagramListener, CommandListener {
      * @param message
      */
     protected void processSessionUpdated(UpdateCommand command, String message) {
+        log.debug("Processing event SessionUpdated");
+
         RTPProxySession session = command.getSession();
         InetSocketAddress callerMediaAddr = parseMediaAddress(message);
         session.setCallerMediaAddress(callerMediaAddr);

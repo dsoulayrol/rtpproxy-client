@@ -28,7 +28,7 @@ public class CallbackHandlerTest extends BaseTest {
 
     @Before
     public void init() {
-        timeoutMngr = new CommandTimeoutManagerMOCK();
+        timeoutMngr = new CommandTimeoutManagerMOCK(null, 0);
         callbackHandler = new CallbackHandler(timeoutMngr);
         listener = new RTPProxyClientListenerMOCK();
     }

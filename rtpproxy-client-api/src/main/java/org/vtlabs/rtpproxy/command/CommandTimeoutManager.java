@@ -6,6 +6,7 @@ package org.vtlabs.rtpproxy.command;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
@@ -17,24 +18,25 @@ import org.slf4j.LoggerFactory;
  */
 public class CommandTimeoutManager {
 
-    public static final long DEFAULT_COMMAND_TIMEOUT = 2000;
     private Logger log = LoggerFactory.getLogger(CommandTimeoutManager.class);
+    /**
+     * Map to hold 'cookie' -> 'command' maps.
+     */
     private HashMap<String, Command> pendingCommandMap;
-    private HashMap<Command, CommandTimeoutTask> pendingTimeoutTaskMap;
+    /**
+     * Map to hold 'command' -> 'timeout task future object' maps.
+     */
+    private HashMap<Command, ScheduledFuture<CommandTimeoutTask>> timeoutFutureMap;
     private List<CommandListener> listeners;
     private ScheduledThreadPoolExecutor executor;
     private long commandTimeout;
-
-    public CommandTimeoutManager(ScheduledThreadPoolExecutor executor) {
-        this(executor, DEFAULT_COMMAND_TIMEOUT);
-    }
 
     public CommandTimeoutManager(ScheduledThreadPoolExecutor executor,
             long commandTimeout) {
         this.executor = executor;
         this.commandTimeout = commandTimeout;
         pendingCommandMap = new HashMap<String, Command>();
-        pendingTimeoutTaskMap = new HashMap<Command, CommandTimeoutTask>();
+        timeoutFutureMap = new HashMap<Command, ScheduledFuture<CommandTimeoutTask>>();
     }
 
     public void addPendingCommand(Command command) {
@@ -44,35 +46,57 @@ public class CommandTimeoutManager {
             log.debug(sb.toString());
         }
 
-        CommandTimeoutTask timeoutTask = new CommandTimeoutTask(command, this);
-
         synchronized (pendingCommandMap) {
             pendingCommandMap.put(command.getCookie(), command);
         }
 
-        synchronized (pendingTimeoutTaskMap) {
-            pendingTimeoutTaskMap.put(command, timeoutTask);
-            executor.schedule(timeoutTask, commandTimeout,
+        CommandTimeoutTask timeoutTask = new CommandTimeoutTask(command, this);
+        synchronized (timeoutFutureMap) {
+            ScheduledFuture<CommandTimeoutTask> future = (ScheduledFuture<CommandTimeoutTask>) executor.schedule(timeoutTask,
+                    commandTimeout,
                     TimeUnit.MILLISECONDS);
+
+            timeoutFutureMap.put(command, future);
         }
     }
 
     public Command removePendingCommand(String cookie) {
         Command command;
-
         synchronized (pendingCommandMap) {
             command = pendingCommandMap.remove(cookie);
         }
 
-        if (log.isDebugEnabled()) {
-            StringBuilder sb = new StringBuilder("Removing timeout for ");
-            sb.append(command);
-            log.debug(sb.toString());
-        }
+        if (command != null) {
+            if (log.isDebugEnabled()) {
+                StringBuilder sb = new StringBuilder("Removing timeout for ");
+                sb.append(command);
+                log.debug(sb.toString());
+            }
 
-        synchronized (pendingTimeoutTaskMap) {
-            CommandTimeoutTask task = pendingTimeoutTaskMap.remove(command);
-            executor.remove(task);
+            boolean wasCanceled = false;
+            CommandTimeoutTask task = null;
+
+            synchronized (timeoutFutureMap) {
+                ScheduledFuture<CommandTimeoutTask> future =
+                        timeoutFutureMap.remove(command);
+                wasCanceled = future.cancel(false);
+            }
+
+            if (wasCanceled && log.isDebugEnabled()) {
+                StringBuilder sb = new StringBuilder("Timeout sucessful ");
+                sb.append(" canceled for command ").append(command);
+                log.debug(sb.toString());
+                
+            } else {
+                StringBuilder sb = new StringBuilder("Timeout couldn't be ");
+                sb.append("canceled for command").append(command);
+                log.warn(sb.toString());
+            }
+
+        } else {
+            StringBuilder sb = new StringBuilder("Command not found for ");
+            sb.append("cookie \'").append(cookie).append("\'");
+            log.warn(sb.toString());
         }
 
         return command;

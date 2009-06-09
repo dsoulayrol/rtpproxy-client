@@ -16,12 +16,9 @@ public class CommandTimeoutManagerMOCK extends CommandTimeoutManager {
 
     public Command pendingCommand;
 
-    public CommandTimeoutManagerMOCK() {
-        super(null);
-    }
-
-    public CommandTimeoutManagerMOCK(ScheduledThreadPoolExecutor executor) {
-        super(executor);
+    public CommandTimeoutManagerMOCK(ScheduledThreadPoolExecutor executor,
+            long commandTimeout) {
+        super(executor, commandTimeout);
         pendingCommand = null;
     }
 
