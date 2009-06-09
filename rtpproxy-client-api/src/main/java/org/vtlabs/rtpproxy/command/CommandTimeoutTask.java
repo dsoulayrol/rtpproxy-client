@@ -5,6 +5,9 @@
 
 package org.vtlabs.rtpproxy.command;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  *
  * @author mhack
@@ -12,6 +15,7 @@ package org.vtlabs.rtpproxy.command;
 public class CommandTimeoutTask implements Runnable {
     private Command command;
     private CommandTimeoutManager manager;
+    private Logger log = LoggerFactory.getLogger(CommandTimeoutTask.class);
 
     public CommandTimeoutTask(Command command, CommandTimeoutManager manager) {
         this.command = command;
@@ -19,7 +23,13 @@ public class CommandTimeoutTask implements Runnable {
     }
 
     public void run() {
-        command.commandTimeout();
-        manager.removePendingCommand(command.getCookie());
+        if (log.isDebugEnabled()) {
+            StringBuilder sb = new StringBuilder("Running command timeout ");
+            sb.append("task for command ").append(command);
+            log.debug(sb.toString());
+        }
+
+        CommandListener listener = command.getListener();
+        listener.commandTimeout(command);
     }
 }

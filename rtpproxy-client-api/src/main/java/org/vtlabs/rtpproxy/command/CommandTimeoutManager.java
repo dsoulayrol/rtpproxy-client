@@ -26,10 +26,15 @@ public class CommandTimeoutManager {
     private long commandTimeout;
 
     public CommandTimeoutManager(ScheduledThreadPoolExecutor executor) {
+        this(executor, DEFAULT_COMMAND_TIMEOUT);
+    }
+
+    public CommandTimeoutManager(ScheduledThreadPoolExecutor executor,
+            long commandTimeout) {
         this.executor = executor;
+        this.commandTimeout = commandTimeout;
         pendingCommandMap = new HashMap<String, Command>();
         pendingTimeoutTaskMap = new HashMap<Command, CommandTimeoutTask>();
-        commandTimeout = DEFAULT_COMMAND_TIMEOUT;
     }
 
     public void addPendingCommand(Command command) {

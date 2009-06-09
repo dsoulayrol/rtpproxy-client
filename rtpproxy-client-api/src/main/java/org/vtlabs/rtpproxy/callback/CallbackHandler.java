@@ -4,7 +4,6 @@ import java.net.InetSocketAddress;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
-import org.apache.mina.util.SessionLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vtlabs.rtpproxy.client.RTPProxyClientListener;
@@ -45,11 +44,20 @@ public class CallbackHandler implements DatagramListener, CommandListener {
      */
     public void processResponse(String cookie, String message,
             InetSocketAddress srcAddr) {
+        
+        if (log.isDebugEnabled()) {
+            StringBuilder sb = new StringBuilder("Processing reponse message ");
+            sb.append("\'").append(cookie);
+            sb.append(" ").append(message).append("\'");
+            sb.append(" received from ").append(srcAddr);
+            log.debug(sb.toString());
+        }
+
         Command command = timeoutManager.removePendingCommand(cookie);
 
         if (command instanceof UpdateCommand) {
             processUpdateCommand((UpdateCommand) command, message);
-
+            
         } else {
             processUnknownCommand(command, message);
         }
@@ -169,9 +177,36 @@ public class CallbackHandler implements DatagramListener, CommandListener {
      * @param Command that reached the timeout period.
      */
     public void commandTimeout(Command command) {
+        if (log.isDebugEnabled()) {
+            StringBuilder sb = new StringBuilder("Processing command timeout ");
+            sb.append(command);
+            log.debug(sb.toString());
+        }
+
+        if (command instanceof UpdateCommand) {
+            processUpdateCommandTimeout((UpdateCommand) command);
+
+        } else {
+            StringBuilder sb = new StringBuilder("Unknown command timeout ");
+            sb.append(command);
+            log.error(sb.toString());
+        }
+    }
+
+    /**
+     * Process update command timeout.
+     */
+    public void processUpdateCommandTimeout(UpdateCommand command) {
         RTPProxyClientListener listener = command.getCallbackListener();
-        listener.createSessionTimeout(command.getSessionID(),
-                command.getAppData());
+        RTPProxySession session = command.getSession();
+        Object appData = command.getAppData();
+        String sessionID = command.getSessionID();
+
+        if (session == null) {
+            listener.createSessionTimeout(sessionID, appData);
+        } else {
+            listener.updateSessionTimeout(session, appData);
+        }
     }
 
     /**

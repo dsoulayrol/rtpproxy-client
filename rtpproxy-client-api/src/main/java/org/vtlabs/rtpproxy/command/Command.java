@@ -21,9 +21,9 @@ public abstract class Command {
     private CommandListener cmdListener;
     private RTPProxyServer server;
 
-    public Command() {
-        UUID uuid = UUID.randomUUID();
-        cookie = uuid.toString();
+    public Command(CommandListener cmdListener) {
+        this.cmdListener = cmdListener;
+        cookie = UUID.randomUUID().toString();
     }
 
     /**
@@ -86,8 +86,8 @@ public abstract class Command {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("Command[");
-        sb.append("commandType = ").append(this.getClass().getName());
+        StringBuilder sb = new StringBuilder(this.getClass().getName());
+        sb.append("[commandType = ").append(this.getClass().getName());
         sb.append(", sessionID = ").append(getSessionID());
         sb.append(", cookie = ").append(getCookie());
         sb.append("]");

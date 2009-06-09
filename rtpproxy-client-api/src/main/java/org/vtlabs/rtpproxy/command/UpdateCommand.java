@@ -15,7 +15,8 @@ public class UpdateCommand extends Command {
     private String fromTag;
     private String toTag;
 
-    public UpdateCommand() {
+    public UpdateCommand(CommandListener cmdListener) {
+        super(cmdListener);
         session = null;
         callID = null;
         address = null;
@@ -24,8 +25,8 @@ public class UpdateCommand extends Command {
         toTag = null;
     }
 
-    public UpdateCommand(RTPProxySession session) {
-        this();
+    public UpdateCommand(RTPProxySession session, CommandListener cmdListener) {
+        this(cmdListener);
         this.session = session;
         callID = session.getSessionID();
     }

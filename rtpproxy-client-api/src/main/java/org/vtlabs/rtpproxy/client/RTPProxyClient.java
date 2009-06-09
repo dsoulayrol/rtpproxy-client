@@ -27,7 +27,7 @@ public class RTPProxyClient {
             throws IOException, RTPProxyClientConfigException {
         this.config = config;
         executor = createThreadPoolExecutor(config.getPoolSize());
-        commandTimeout = createCommandTimeoutManager(executor);
+        commandTimeout = createCommandTimeoutManager(executor, config.getCommandTimeout());
         callbackHandler = createCallbackHandler(commandTimeout);
         udpService = createDatagraService(config.getBindPort(), callbackHandler);
     }
@@ -47,7 +47,7 @@ public class RTPProxyClient {
      */
     public void createSession(String sessionID, Object appData,
             RTPProxyClientListener listener) throws NoServerAvailableException {
-        UpdateCommand updateCmd = new UpdateCommand();
+        UpdateCommand updateCmd = new UpdateCommand(callbackHandler);
         updateCmd.setCallID(sessionID);
 
         // No matter the fromtag content since it matchs that used in the
@@ -73,7 +73,7 @@ public class RTPProxyClient {
      */
     public void updateSession(RTPProxySession session, Object appData,
             RTPProxyClientListener listener) throws NoServerAvailableException {
-        UpdateCommand updateCmd = new UpdateCommand(session);
+        UpdateCommand updateCmd = new UpdateCommand(session, callbackHandler);
 
         // No matter the fromtag and totag content since it matchs that used in
         // the createSession() method above to link the callee and caller
@@ -133,8 +133,8 @@ public class RTPProxyClient {
      * @return
      */
     protected CommandTimeoutManager createCommandTimeoutManager(
-            ScheduledThreadPoolExecutor executor) {
-        return new CommandTimeoutManager(executor);
+            ScheduledThreadPoolExecutor executor, long commandTimeout) {
+        return new CommandTimeoutManager(executor, commandTimeout);
     }
 
     /**

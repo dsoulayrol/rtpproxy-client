@@ -22,15 +22,22 @@ public class RTPProxyClientConfig {
      * timeout service.
      */
     public static final int DEFAULT_SCHEDULED_POOL_SIZE = 3;
+
+    /**
+     * Default timeout, in millisendocs, for sent commands to RTPProxy.
+     */
+    public static final int DEFAULT_COMMAND_TIMEOUT = 5000;
     
     private int bindPort;
     private int poolSize;
     private List<RTPProxyServer> serverList;
+    private long commandTimeout;
 
     public RTPProxyClientConfig() {
         serverList = new ArrayList<RTPProxyServer>();
         setBindPort(DEFAULT_BIND_PORT);
         setPoolSize(DEFAULT_SCHEDULED_POOL_SIZE);
+        setCommandTimeout(DEFAULT_COMMAND_TIMEOUT);
     }
 
     public int getBindPort() {
@@ -59,5 +66,13 @@ public class RTPProxyClientConfig {
 
     public boolean removeServer(RTPProxyServer server) {
         return serverList.remove(server);
+    }
+
+    public long getCommandTimeout() {
+        return commandTimeout;
+    }
+
+    public void setCommandTimeout(long commandTimeout) {
+        this.commandTimeout = commandTimeout;
     }
 }

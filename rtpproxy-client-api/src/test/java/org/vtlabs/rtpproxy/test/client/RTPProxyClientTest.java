@@ -102,7 +102,7 @@ public class RTPProxyClientTest {
 
         @Override
         protected CommandTimeoutManager createCommandTimeoutManager(
-                ScheduledThreadPoolExecutor executor) {
+                ScheduledThreadPoolExecutor executor, long commandTimeout) {
 
             return new CommandTimeoutManagerMOCK();
         }

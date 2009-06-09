@@ -46,7 +46,7 @@ public class CallbackHandlerTest extends BaseTest {
 
         // Create a update command to be recovered by the callback handler via
         // the command timeout manager
-        UpdateCommand updateCommand = new UpdateCommand();
+        UpdateCommand updateCommand = new UpdateCommand(callbackHandler);
         updateCommand.setCallbackListener(listener);
         updateCommand.setAppData(appData);
         updateCommand.setCallID(sessionID);
@@ -118,7 +118,7 @@ public class CallbackHandlerTest extends BaseTest {
 
         // Create a update command to be recovered by the callback handler via
         // the command timeout manager
-        UpdateCommand updateCommand = new UpdateCommand();
+        UpdateCommand updateCommand = new UpdateCommand(callbackHandler);
         updateCommand.setCallbackListener(listener);
         updateCommand.setAppData(appData);
         updateCommand.setCallID(sessionID);
@@ -189,7 +189,7 @@ public class CallbackHandlerTest extends BaseTest {
 
         // Create a update command to be recovered by the callback handler via
         // the command timeout manager
-        UpdateCommand updateCommand = new UpdateCommand(session);
+        UpdateCommand updateCommand = new UpdateCommand(session, callbackHandler);
         updateCommand.setCallbackListener(listener);
         updateCommand.setAppData(appData);
         updateCommand.setCallID(sessionID);
@@ -271,7 +271,7 @@ public class CallbackHandlerTest extends BaseTest {
 
         // Create a update command to be recovered by the callback handler via
         // the command timeout manager
-        UpdateCommand updateCommand = new UpdateCommand(session);
+        UpdateCommand updateCommand = new UpdateCommand(session, callbackHandler);
         updateCommand.setCallbackListener(listener);
         updateCommand.setAppData(appData);
         updateCommand.setCallID(sessionID);
@@ -321,7 +321,7 @@ public class CallbackHandlerTest extends BaseTest {
         String sessionID = "command_timeout_sessionid";
         Object appData = new Object();
 
-        UpdateCommand command = new UpdateCommand();
+        UpdateCommand command = new UpdateCommand(callbackHandler);
         command.setSessionID(sessionID);
         command.setAppData(appData);
         command.setCallbackListener(listener);

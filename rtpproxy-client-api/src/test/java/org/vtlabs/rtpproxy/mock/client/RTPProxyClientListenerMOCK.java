@@ -54,6 +54,10 @@ public class RTPProxyClientListenerMOCK
         updateFailedThrowable = t;
     }
 
+    public void updateSessionTimeout(RTPProxySession session, Object appData) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     public void sessionCreated(RTPProxySession session, Object appData) {
         isCreate = true;
         createdSession = session;
