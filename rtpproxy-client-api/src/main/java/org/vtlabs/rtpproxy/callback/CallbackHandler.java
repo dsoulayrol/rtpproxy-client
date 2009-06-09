@@ -44,7 +44,7 @@ public class CallbackHandler implements DatagramListener, CommandListener {
      */
     public void processResponse(String cookie, String message,
             InetSocketAddress srcAddr) {
-        
+
         if (log.isDebugEnabled()) {
             StringBuilder sb = new StringBuilder("Processing reponse message ");
             sb.append("\'").append(cookie);
@@ -57,7 +57,7 @@ public class CallbackHandler implements DatagramListener, CommandListener {
 
         if (command instanceof UpdateCommand) {
             processUpdateCommand((UpdateCommand) command, message);
-            
+
         } else {
             processUnknownCommand(command, message);
         }
@@ -113,7 +113,7 @@ public class CallbackHandler implements DatagramListener, CommandListener {
         sb.append("Error creating a RTPProxy session: ");
         sb.append("\'").append(message).append("\'");
         Exception exception = new Exception(sb.toString());
-        
+
         RTPProxyClientListener listener = command.getCallbackListener();
         listener.createSessionFailed(command.getSessionID(),
                 command.getAppData(), exception);
@@ -126,7 +126,8 @@ public class CallbackHandler implements DatagramListener, CommandListener {
      * @param Command
      * @param Response message
      */
-    protected void processSessionCreated(UpdateCommand command, String message) {
+    protected void processSessionCreated(UpdateCommand command,
+            String message) {
         log.debug("Processing event SessionCreated");
 
         RTPProxySession session = new RTPProxySession();
@@ -171,7 +172,8 @@ public class CallbackHandler implements DatagramListener, CommandListener {
      * @param command
      * @param message
      */
-    protected void processSessionUpdated(UpdateCommand command, String message) {
+    protected void processSessionUpdated(UpdateCommand command,
+            String message) {
         log.debug("Processing event SessionUpdated");
 
         RTPProxySession session = command.getSession();

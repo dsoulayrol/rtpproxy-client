@@ -18,16 +18,10 @@ import org.slf4j.LoggerFactory;
 public class DatagramHandler extends IoHandlerAdapter {
 
     private Logger log = LoggerFactory.getLogger(DatagramHandler.class);
-    
     private DatagramListener listener;
 
     public DatagramHandler(DatagramListener listener) {
         this.listener = listener;
-    }
-
-    @Override
-    public void exceptionCaught(IoSession session, Throwable t)
-            throws Exception {
     }
 
     @Override
@@ -47,7 +41,7 @@ public class DatagramHandler extends IoHandlerAdapter {
             sb.append(", message = \'").append(message).append("\'");
             log.debug(sb.toString());
         }
-        
+
         listener.processResponse(cookie, message, srcAddr);
     }
 }

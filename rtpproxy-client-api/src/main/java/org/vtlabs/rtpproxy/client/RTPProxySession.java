@@ -43,4 +43,15 @@ public class RTPProxySession {
     public void setSessionID(String sessionID) {
         this.sessionID = sessionID;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("RTPProxySession[");
+        sb.append("sessionID = ").append(sessionID);
+        sb.append(", calleeMediaAddress = ").append(calleeMediaAddress);
+        sb.append(", callerMediaAddress = ").append(callerMediaAddress);
+        sb.append(", server = ").append(server);
+        sb.append("]");
+        return sb.toString();
+    }
 }

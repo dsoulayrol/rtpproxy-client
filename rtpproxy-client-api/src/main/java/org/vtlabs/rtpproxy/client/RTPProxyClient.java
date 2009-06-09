@@ -49,15 +49,21 @@ public class RTPProxyClient {
             RTPProxyClientListener listener) throws NoServerAvailableException {
         UpdateCommand updateCmd = new UpdateCommand(callbackHandler);
         updateCmd.setSessionID(sessionID);
+        updateCmd.setCallbackListener(listener);
+        updateCmd.setListener(callbackHandler);
 
         // No matter the fromtag content since it matchs that used in the
         // updateSession() method below to link the callee and caller session in
         // the RTPProxy.
         updateCmd.setFromTag("fromtag");
 
+        // Get a server to handle the request and set it to the update command
+        RTPProxyServer server = getServer();
+        updateCmd.setServer(server);
+
         String cookie = updateCmd.getCookie();
         String message = updateCmd.getMessage();
-        InetSocketAddress serverAddr = getServer().getAddress();
+        InetSocketAddress serverAddr = server.getAddress();
 
         commandTimeout.addPendingCommand(updateCmd);
         udpService.send(cookie, message, serverAddr);
@@ -74,6 +80,8 @@ public class RTPProxyClient {
     public void updateSession(RTPProxySession session, Object appData,
             RTPProxyClientListener listener) throws NoServerAvailableException {
         UpdateCommand updateCmd = new UpdateCommand(session, callbackHandler);
+        updateCmd.setCallbackListener(listener);
+        updateCmd.setServer(session.getServer());
 
         // No matter the fromtag and totag content since it matchs that used in
         // the createSession() method above to link the callee and caller

@@ -16,4 +16,13 @@ public class RTPProxyServer {
     public void setAddress(InetSocketAddress address) {
         this.address = address;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("RTPProxyServer[");
+        sb.append("address = ").append(address);
+        sb.append("]");
+        return sb.toString();
+    }
+
 }

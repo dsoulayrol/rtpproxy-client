@@ -16,6 +16,8 @@ import org.vtlabs.rtpproxy.client.RTPProxyClientConfigurator;
 import org.vtlabs.rtpproxy.client.RTPProxyClientListener;
 import org.vtlabs.rtpproxy.client.RTPProxyServer;
 import org.vtlabs.rtpproxy.client.RTPProxySession;
+import org.vtlabs.rtpproxy.command.Command;
+import org.vtlabs.rtpproxy.command.CommandListener;
 import org.vtlabs.rtpproxy.command.CommandTimeoutManager;
 import org.vtlabs.rtpproxy.command.UpdateCommand;
 import org.vtlabs.rtpproxy.mock.client.RTPProxyClientListenerMOCK;

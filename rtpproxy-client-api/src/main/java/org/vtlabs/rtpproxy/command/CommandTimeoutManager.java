@@ -84,7 +84,7 @@ public class CommandTimeoutManager {
 
             if (wasCanceled && log.isDebugEnabled()) {
                 StringBuilder sb = new StringBuilder("Timeout sucessful ");
-                sb.append(" canceled for command ").append(command);
+                sb.append("canceled for command ").append(command);
                 log.debug(sb.toString());
                 
             } else {
