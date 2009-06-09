@@ -49,7 +49,7 @@ public class CallbackHandlerTest extends BaseTest {
         UpdateCommand updateCommand = new UpdateCommand(callbackHandler);
         updateCommand.setCallbackListener(listener);
         updateCommand.setAppData(appData);
-        updateCommand.setCallID(sessionID);
+        updateCommand.setSessionID(sessionID);
         updateCommand.setCookie(cmdCookie);
         updateCommand.setFromTag(fromTag);
         updateCommand.setToTag(toTag);
@@ -121,7 +121,7 @@ public class CallbackHandlerTest extends BaseTest {
         UpdateCommand updateCommand = new UpdateCommand(callbackHandler);
         updateCommand.setCallbackListener(listener);
         updateCommand.setAppData(appData);
-        updateCommand.setCallID(sessionID);
+        updateCommand.setSessionID(sessionID);
         updateCommand.setCookie(cmdCookie);
         updateCommand.setFromTag(fromTag);
         updateCommand.setToTag(toTag);
@@ -192,7 +192,7 @@ public class CallbackHandlerTest extends BaseTest {
         UpdateCommand updateCommand = new UpdateCommand(session, callbackHandler);
         updateCommand.setCallbackListener(listener);
         updateCommand.setAppData(appData);
-        updateCommand.setCallID(sessionID);
+        updateCommand.setSessionID(sessionID);
         updateCommand.setCookie(cmdCookie);
         updateCommand.setFromTag(fromTag);
         updateCommand.setToTag(toTag);
@@ -274,7 +274,7 @@ public class CallbackHandlerTest extends BaseTest {
         UpdateCommand updateCommand = new UpdateCommand(session, callbackHandler);
         updateCommand.setCallbackListener(listener);
         updateCommand.setAppData(appData);
-        updateCommand.setCallID(sessionID);
+        updateCommand.setSessionID(sessionID);
         updateCommand.setCookie(cmdCookie);
         updateCommand.setFromTag(fromTag);
         updateCommand.setToTag(toTag);

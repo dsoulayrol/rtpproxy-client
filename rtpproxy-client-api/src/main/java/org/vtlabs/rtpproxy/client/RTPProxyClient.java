@@ -48,7 +48,7 @@ public class RTPProxyClient {
     public void createSession(String sessionID, Object appData,
             RTPProxyClientListener listener) throws NoServerAvailableException {
         UpdateCommand updateCmd = new UpdateCommand(callbackHandler);
-        updateCmd.setCallID(sessionID);
+        updateCmd.setSessionID(sessionID);
 
         // No matter the fromtag content since it matchs that used in the
         // updateSession() method below to link the callee and caller session in

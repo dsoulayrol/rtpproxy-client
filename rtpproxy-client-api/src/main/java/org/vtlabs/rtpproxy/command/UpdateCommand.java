@@ -9,7 +9,6 @@ import org.vtlabs.rtpproxy.client.RTPProxySession;
  */
 public class UpdateCommand extends Command {
     private RTPProxySession session;
-    private String callID;
     private String address;
     private Integer port;
     private String fromTag;
@@ -18,7 +17,6 @@ public class UpdateCommand extends Command {
     public UpdateCommand(CommandListener cmdListener) {
         super(cmdListener);
         session = null;
-        callID = null;
         address = null;
         port = null;
         fromTag = null;
@@ -28,7 +26,7 @@ public class UpdateCommand extends Command {
     public UpdateCommand(RTPProxySession session, CommandListener cmdListener) {
         this(cmdListener);
         this.session = session;
-        callID = session.getSessionID();
+        setSessionID(session.getSessionID());
     }
 
     /**
@@ -36,7 +34,7 @@ public class UpdateCommand extends Command {
      */
     @Override
     public String getMessage() {
-        StringBuilder sb = new StringBuilder("U ").append(callID);
+        StringBuilder sb = new StringBuilder("U ").append(getSessionID());
         sb.append(" ").append(address != null ? address : 0);
         sb.append(" ").append(port != null ? port : 0);
         sb.append(" ").append(fromTag != null ? fromTag : 0);
@@ -50,14 +48,6 @@ public class UpdateCommand extends Command {
 
     public void setAddress(String address) {
         this.address = address;
-    }
-
-    public String getCallID() {
-        return callID;
-    }
-
-    public void setCallID(String callID) {
-        this.callID = callID;
     }
 
     public String getFromTag() {

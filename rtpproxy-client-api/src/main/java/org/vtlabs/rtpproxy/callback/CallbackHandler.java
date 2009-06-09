@@ -107,8 +107,8 @@ public class CallbackHandler implements DatagramListener, CommandListener {
         Exception exception = new Exception(sb.toString());
         
         RTPProxyClientListener listener = command.getCallbackListener();
-        listener.createSessionFailed(command.getCallID(), command.getAppData(),
-                exception);
+        listener.createSessionFailed(command.getSessionID(),
+                command.getAppData(), exception);
     }
 
     /**
