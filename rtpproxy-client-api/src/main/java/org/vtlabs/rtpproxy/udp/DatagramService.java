@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * RTPProxyClient Datagram (UDP) transport services.
  *
  * @author Marcos Hack <marcosh@voicetechnology.com.br>
  */
@@ -31,31 +32,33 @@ public class DatagramService {
         acceptor = createDatagramAcceptor();
         handler = createDatagramHandler(listener);
         this.bindPort = bindPort;
-        init();
+        start();
     }
 
+    /**
+     * Stop DatagramService and release all used resources.
+     *
+     * @throws java.io.IOException
+     */
     public void stop() throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        acceptor.unbindAll();
     }
 
-    public void send(String cookie, String message, InetSocketAddress dstAddr) {
-        InetSocketAddress localAddr = new InetSocketAddress(bindPort);
-        IoSession session = acceptor.newSession(dstAddr, localAddr);
-
-        // Create message in the format "COOKIE MESSAGE"
-        StringBuilder sbMessage = new StringBuilder(cookie);
-        sbMessage.append(" ").append(message);
-        send(sbMessage.toString(), session);
-    }
-    
-    protected void init() throws IOException {
+    /**
+     * Initialize and bind DatagramService to the socket port informed in the
+     * constructor.
+     *
+     * @throws java.io.IOException
+     */
+    protected void start() throws IOException {
         ByteBuffer.setUseDirectBuffers(false);
         ByteBuffer.setAllocator(new SimpleByteBufferAllocator());
 
         DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
         //chain.addLast("logger", new LoggingFilter());
 
-        TextLineCodecFactory codecFactory = new TextLineCodecFactory(Charset.forName("ASCII"));
+        TextLineCodecFactory codecFactory =
+                new TextLineCodecFactory(Charset.forName("ASCII"));
         ProtocolCodecFilter codecFilter = new ProtocolCodecFilter(codecFactory);
         chain.addLast("codec", codecFilter);
 
@@ -65,6 +68,17 @@ public class DatagramService {
         sessionConfig.setReuseAddress(true);
 
         bind(new InetSocketAddress(bindPort), handler);
+    }
+
+
+    public void send(String cookie, String message, InetSocketAddress dstAddr) {
+        InetSocketAddress localAddr = new InetSocketAddress(bindPort);
+        IoSession session = acceptor.newSession(dstAddr, localAddr);
+
+        // Create message in the format "COOKIE MESSAGE"
+        StringBuilder sbMessage = new StringBuilder(cookie);
+        sbMessage.append(" ").append(message);
+        send(sbMessage.toString(), session);
     }
 
     /**

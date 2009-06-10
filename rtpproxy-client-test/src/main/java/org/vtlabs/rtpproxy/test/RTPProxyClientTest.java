@@ -31,7 +31,7 @@ public class RTPProxyClientTest implements RTPProxyClientListener {
         try {
             configureLog4j();
             log = LoggerFactory.getLogger(RTPProxyClientTest.class);
-            
+
             RTPProxyClientTest test = new RTPProxyClientTest();
             test.run();
 
@@ -53,14 +53,13 @@ public class RTPProxyClientTest implements RTPProxyClientListener {
             log.info("Creating new session. SessionID = " + sessionID);
             client.createSession(sessionID, appData, this);
 
-            synchronized(this) {
-                // We'll be notified when 'sessionUpdated()' callback method
-                // is called.
+            synchronized (this) {
+                // We'll be notified when some callback method was called.
                 wait();
             }
-
-            log.info("Session sucessful created", session);
             
+            client.terminate();
+
         } catch (NoServerAvailableException noServerEx) {
             log.error("No servers available to create session.", noServerEx);
 
@@ -83,31 +82,38 @@ public class RTPProxyClientTest implements RTPProxyClientListener {
     }
 
     public void sessionUpdated(RTPProxySession session, Object appData) {
-        log.info("Session updated: " + session);
-
-        synchronized(this) {
-            notify();
-        }
+        log.info("Session creation completed: " + session);
+        wakeup();
     }
 
     public void createSessionTimeout(String sessionID, Object appData) {
         log.error("Session creation timeout: " + sessionID);
+        wakeup();
     }
 
     public void updateSessionTimeout(RTPProxySession session, Object appData) {
         log.error("Session update timeout: " + session);
+        wakeup();
     }
 
     public void createSessionFailed(String sessionID, Object appData, Throwable t) {
         log.error("Session creation failed: " + sessionID, t);
+        wakeup();
     }
 
     public void updateSessionFailed(RTPProxySession session, Object appData, Throwable t) {
         log.error("Session update failed: " + session, t);
+        wakeup();
     }
 
     private static void configureLog4j() {
         String configFile = "conf/log4j.properties";
         System.setProperty("log4j.configuration", "file:" + configFile);
+    }
+
+    private void wakeup() {
+        synchronized (this) {
+            notify();
+        }
     }
 }

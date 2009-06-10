@@ -22,6 +22,7 @@ public class RTPProxyClient {
     protected CallbackHandler callbackHandler;
     protected ScheduledThreadPoolExecutor executor;
     protected RTPProxyClientConfig config;
+    protected boolean isTerminated;
 
     public RTPProxyClient(RTPProxyClientConfig config)
             throws IOException, RTPProxyClientConfigException {
@@ -30,6 +31,30 @@ public class RTPProxyClient {
         commandTimeout = createCommandTimeoutManager(executor, config.getCommandTimeout());
         callbackHandler = createCallbackHandler(commandTimeout);
         udpService = createDatagraService(config.getBindPort(), callbackHandler);
+    }
+
+    /**
+     * Terminate RTPProxyClient instance and release all resources. All
+     * subsequent call to client methods will throw an exception
+     * RTPProxyClientTerminatedException.
+     */
+    public void terminate() throws RTPProxyClientTerminatedException,
+            IOException {
+        synchronized (this) {
+            if (!isTerminated) {
+                udpService.stop();
+                commandTimeout.terminate();
+                executor.shutdownNow();
+
+            } else {
+                throw new RTPProxyClientTerminatedException(
+                        "RTPProxyClient instance is already terminated.");
+            }
+        }
+    }
+
+    public boolean isTerminated() {
+        return isTerminated;
     }
 
     /**
@@ -47,6 +72,9 @@ public class RTPProxyClient {
      */
     public void createSession(String sessionID, Object appData,
             RTPProxyClientListener listener) throws NoServerAvailableException {
+
+        checkState();
+
         UpdateCommand updateCmd = new UpdateCommand(callbackHandler);
         updateCmd.setSessionID(sessionID);
         updateCmd.setCallbackListener(listener);
@@ -79,6 +107,9 @@ public class RTPProxyClient {
      */
     public void updateSession(RTPProxySession session, Object appData,
             RTPProxyClientListener listener) throws NoServerAvailableException {
+
+        checkState();
+
         UpdateCommand updateCmd = new UpdateCommand(session, callbackHandler);
         updateCmd.setCallbackListener(listener);
         updateCmd.setServer(session.getServer());
@@ -134,7 +165,20 @@ public class RTPProxyClient {
             throw new NoServerAvailableException("Server list is empty");
         }
     }
-    
+
+    /**
+     * Check if the RTPProxyClient instance is able to provide the service.
+     * Basically it checks if the instance was terminated.
+     *
+     * @throws RTPProxyClientTerminatedException.
+     */
+    protected void checkState() {
+        if (isTerminated) {
+            throw new RTPProxyClientTerminatedException(
+                    "RTPProxyClient instance is already terminated.");
+        }
+    }
+
     /**
      * Factory method to create CommandManager.
      *
@@ -154,7 +198,7 @@ public class RTPProxyClient {
             DatagramListener listener) throws IOException {
         return new DatagramService(bindPort, listener);
     }
-    
+
     /**
      * Factory method to create RTPClientResponseHandler.
      *

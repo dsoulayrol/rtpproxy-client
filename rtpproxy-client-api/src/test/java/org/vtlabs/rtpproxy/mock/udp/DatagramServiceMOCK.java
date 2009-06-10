@@ -26,7 +26,7 @@ public class DatagramServiceMOCK extends DatagramService {
     }
 
     @Override
-    protected void init() throws IOException {
+    public void start() throws IOException {
         // do nothing
     }
 

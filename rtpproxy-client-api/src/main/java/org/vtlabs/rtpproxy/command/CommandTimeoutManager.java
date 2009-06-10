@@ -4,6 +4,7 @@
  */
 package org.vtlabs.rtpproxy.command;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
@@ -37,6 +38,7 @@ public class CommandTimeoutManager {
         this.commandTimeout = commandTimeout;
         pendingCommandMap = new HashMap<String, Command>();
         timeoutFutureMap = new HashMap<Command, ScheduledFuture<CommandTimeoutTask>>();
+        listeners = new ArrayList<CommandListener>();
     }
 
     public void addPendingCommand(Command command) {
@@ -112,5 +114,21 @@ public class CommandTimeoutManager {
         synchronized (listeners) {
             listeners.remove(listener);
         }
+    }
+
+    public void terminate() {
+        synchronized(listeners) {
+            listeners.clear();
+        }
+
+        synchronized(pendingCommandMap) {
+            pendingCommandMap.clear();
+        }
+
+        synchronized(timeoutFutureMap) {
+            timeoutFutureMap.clear();
+        }
+
+        executor = null;
     }
 }
