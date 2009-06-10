@@ -16,7 +16,6 @@ import org.vtlabs.rtpproxy.udp.DatagramService;
  * @author mhack
  */
 public class DatagramServiceMOCK extends DatagramService {
-    public String sentCookie;
     public String sentMessage;
     public InetSocketAddress sentDstAddr;
 
@@ -31,8 +30,7 @@ public class DatagramServiceMOCK extends DatagramService {
     }
 
     @Override
-    public void send(String cookie, String message, InetSocketAddress dstAddr) {
-        sentCookie = cookie;
+    public void send(String message, InetSocketAddress dstAddr) {
         sentMessage = message;
         sentDstAddr = dstAddr;
     }

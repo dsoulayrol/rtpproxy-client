@@ -2,28 +2,60 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.vtlabs.rtpproxy.command;
 
 import java.util.UUID;
 import org.vtlabs.rtpproxy.client.RTPProxyClientListener;
-import org.vtlabs.rtpproxy.client.RTPProxyServer;
 
 /**
  *
  * @author mhack
  */
 public abstract class Command {
-    private Object appData;
-    private String sessionID;
+
+    /**
+     * Command cookie, used to identify callback messages from the RTPProxy
+     * server. It's used as the first argument of all commands.
+     */
     private String cookie;
+
+    /**
+     * Session ID used as 'callid' parameter of messages sent to RTPProxy
+     * server.
+     */
+    private String sessionID;
+
+    /**
+     * Command 'fromtag' argument.
+     */
+    private String fromTag;
+
+    /**
+     * Command 'totag' argument.
+     */
+    private String toTag;
+
+    /**
+     * Arbitrary object that is passed back as argument to the callback
+     * listener. The RTPProxy-Client doesn't use it internally.
+     */
+    private Object appData;
+
+    /**
+     * Listener of the callback events received from the RTPProxy server.
+     */
     private RTPProxyClientListener listener;
+
+    /**
+     * Command listener to receive timeout event from the CommandTimeoutManager.
+     */
     private CommandListener cmdListener;
-    private RTPProxyServer server;
 
     public Command(CommandListener cmdListener) {
         this.cmdListener = cmdListener;
         cookie = UUID.randomUUID().toString();
+        fromTag = null;
+        toTag = null;
     }
 
     /**
@@ -76,12 +108,20 @@ public abstract class Command {
         this.sessionID = sessionID;
     }
 
-    public RTPProxyServer getServer() {
-        return server;
+    public String getFromTag() {
+        return fromTag;
     }
 
-    public void setServer(RTPProxyServer server) {
-        this.server = server;
+    public void setFromTag(String fromTag) {
+        this.fromTag = fromTag;
+    }
+
+    public String getToTag() {
+        return toTag;
+    }
+
+    public void setToTag(String toTag) {
+        this.toTag = toTag;
     }
 
     @Override

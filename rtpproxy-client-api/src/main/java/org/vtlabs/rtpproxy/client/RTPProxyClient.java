@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import org.vtlabs.rtpproxy.command.CommandTimeoutManager;
 import org.vtlabs.rtpproxy.callback.CallbackHandler;
+import org.vtlabs.rtpproxy.command.DestroyCommand;
 import org.vtlabs.rtpproxy.command.UpdateCommand;
 import org.vtlabs.rtpproxy.udp.DatagramListener;
 import org.vtlabs.rtpproxy.udp.DatagramService;
@@ -89,12 +90,11 @@ public class RTPProxyClient {
         RTPProxyServer server = getServer();
         updateCmd.setServer(server);
 
-        String cookie = updateCmd.getCookie();
         String message = updateCmd.getMessage();
         InetSocketAddress serverAddr = server.getAddress();
 
         commandTimeout.addPendingCommand(updateCmd);
-        udpService.send(cookie, message, serverAddr);
+        udpService.send(message, serverAddr);
     }
 
     /**
@@ -119,13 +119,10 @@ public class RTPProxyClient {
         // session in the RTPProxy.
         updateCmd.setFromTag("totag");
         updateCmd.setToTag("fromtag");
-
-        String cookie = updateCmd.getCookie();
         String message = updateCmd.getMessage();
-        InetSocketAddress serverAddr = session.getServer().getAddress();
 
         commandTimeout.addPendingCommand(updateCmd);
-        udpService.send(cookie, message, serverAddr);
+        udpService.send(message, session.getServer().getAddress());
     }
 
     /**
@@ -136,7 +133,20 @@ public class RTPProxyClient {
      */
     public void destroySession(RTPProxySession session, Object appData,
             RTPProxyClientListener listener) throws NoServerAvailableException {
-        throw new UnsupportedOperationException("Not implemented yet.");
+
+        checkState();
+
+        DestroyCommand destroyCmd = new DestroyCommand(session, callbackHandler);
+        destroyCmd.setCallbackListener(listener);
+
+        // The fromtag and totag doesn't matter since it matchs that used in
+        // the createSession()
+        destroyCmd.setFromTag("fromtag");
+        destroyCmd.setToTag("totag");
+        String message = destroyCmd.getMessage();
+
+        commandTimeout.addPendingCommand(destroyCmd);
+        udpService.send(message, session.getServer().getAddress());
     }
 
     /**

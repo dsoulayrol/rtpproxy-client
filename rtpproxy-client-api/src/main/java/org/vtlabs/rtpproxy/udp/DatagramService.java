@@ -71,14 +71,10 @@ public class DatagramService {
     }
 
 
-    public void send(String cookie, String message, InetSocketAddress dstAddr) {
+    public void send(String message, InetSocketAddress dstAddr) {
         InetSocketAddress localAddr = new InetSocketAddress(bindPort);
         IoSession session = acceptor.newSession(dstAddr, localAddr);
-
-        // Create message in the format "COOKIE MESSAGE"
-        StringBuilder sbMessage = new StringBuilder(cookie);
-        sbMessage.append(" ").append(message);
-        send(sbMessage.toString(), session);
+        send(message, session);
     }
 
     /**

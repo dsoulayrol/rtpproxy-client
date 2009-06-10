@@ -25,12 +25,19 @@ public class RTPProxyClientListenerMOCK
     public RTPProxySession updateFailedSession;
     public Object updateFailedAppData;
     public Object updateFailedThrowable;
+    public boolean isDestroyFail;
+    public RTPProxySession destroyFailedSession;
+    public Object destroyFailedAppData;
+    public Object destroyFailedThrowable;
     public boolean isCreate;
     public RTPProxySession createdSession;
     public Object createdAppData;
     public boolean isUpdate;
     public RTPProxySession updatedSession;
     public Object updatedAppData;
+    public boolean isDestroy;
+    public RTPProxySession destroySession;
+    public Object destroyAppData;
 
     public void createSessionTimeout(String sessionID, Object appData) {
         isTimeout = true;
@@ -68,5 +75,22 @@ public class RTPProxyClientListenerMOCK
         isUpdate = true;
         updatedSession = session;
         updatedAppData = appData;
+    }
+
+    public void destroySessionFailed(RTPProxySession session, Object appData, Throwable t) {
+        isDestroyFail = true;
+        destroyFailedSession = session;
+        destroyFailedAppData = appData;
+        destroyFailedThrowable = t;
+    }
+
+    public void destroySessionTimeout(RTPProxySession session, Object appData) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void sessionDestroyed(RTPProxySession session, Object appData) {
+        isDestroy = true;
+        destroySession = session;
+        destroyAppData = appData;
     }
 }

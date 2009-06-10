@@ -16,9 +16,8 @@ import org.vtlabs.rtpproxy.client.RTPProxyClientConfigurator;
 import org.vtlabs.rtpproxy.client.RTPProxyClientListener;
 import org.vtlabs.rtpproxy.client.RTPProxyServer;
 import org.vtlabs.rtpproxy.client.RTPProxySession;
-import org.vtlabs.rtpproxy.command.Command;
-import org.vtlabs.rtpproxy.command.CommandListener;
 import org.vtlabs.rtpproxy.command.CommandTimeoutManager;
+import org.vtlabs.rtpproxy.command.DestroyCommand;
 import org.vtlabs.rtpproxy.command.UpdateCommand;
 import org.vtlabs.rtpproxy.mock.client.RTPProxyClientListenerMOCK;
 import org.vtlabs.rtpproxy.mock.command.CommandTimeoutManagerMOCK;
@@ -48,19 +47,19 @@ public class RTPProxyClientTest {
     public void createSession() throws Exception {
         String sessionID = "create_session_id";
         Object appData = new Object();
-        String expectedSentMessage = "U " + sessionID + " 0 0 fromtag 0";
 
         client.createSession(sessionID, appData, listener);
 
-        // Asserts
+        
         CommandTimeoutManagerMOCK timeout = client.getCommandTimeoutManager();
         UpdateCommand command = (UpdateCommand) timeout.pendingCommand;
+
+        // Asserts
         assertNotNull("Update command wasn't added to timeout manager",
                 command);
 
         DatagramServiceMOCK udpService = client.getDatagramService();
-        assertEquals("Invalid sent message", expectedSentMessage,
-                udpService.sentMessage);
+        assertNotNull("Invalid sent message", udpService.sentMessage);
     }
 
     @Test
@@ -72,19 +71,41 @@ public class RTPProxyClientTest {
         RTPProxySession session = new RTPProxySession();
         session.setSessionID(sessionID);
         session.setServer(server);
-        String expectedSentMessage = "U " + sessionID + " 0 0 totag fromtag";
 
         client.updateSession(session, appData, listener);
 
-        // Asserts
         CommandTimeoutManagerMOCK timeout = client.getCommandTimeoutManager();
         UpdateCommand command = (UpdateCommand) timeout.pendingCommand;
+
+        // Asserts
         assertNotNull("Update command wasn't added to timeout manager",
                 command);
 
         DatagramServiceMOCK udpService = client.getDatagramService();
-        assertEquals("Invalid sent message", expectedSentMessage,
-                udpService.sentMessage);
+        assertNotNull("Invalid sent message", udpService.sentMessage);
+    }
+
+    @Test
+    public void destroySession() throws Exception {
+        String sessionID = "destroy_session_id";
+        Object appData = new Object();
+        RTPProxyServer server = new RTPProxyServer();
+        server.setAddress(new InetSocketAddress("127.0.0.1", 22222));
+        RTPProxySession session = new RTPProxySession();
+        session.setSessionID(sessionID);
+        session.setServer(server);
+
+        client.destroySession(session, appData, listener);
+
+        CommandTimeoutManagerMOCK timeout = client.getCommandTimeoutManager();
+        DestroyCommand command = (DestroyCommand) timeout.pendingCommand;
+
+        // Asserts
+        assertNotNull("Update command wasn't added to timeout manager",
+                command);
+
+        DatagramServiceMOCK udpService = client.getDatagramService();
+        assertNotNull("Invalid sent message", udpService.sentMessage);
     }
 
     protected class RTPProxyClientMOCK extends RTPProxyClient {

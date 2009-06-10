@@ -23,13 +23,11 @@ public class DatagramServiceTest extends BaseTest {
     public void send() throws Exception {
         DatagramListenerMOCK listener = new DatagramListenerMOCK();
         DatagramServiceMOCK service = new DatagramServiceMOCK(9998, listener);
-        String cookie = "cookie";
-        String message = "message";
+        String message = "cookie message";
         InetSocketAddress dstAddr = new InetSocketAddress("localhost", 9999);
-        service.send(cookie, message, dstAddr);
+        service.send(message, dstAddr);
 
-        assertEquals("Invalid sent message", cookie + " " +
-                message, service.messageSent);
+        assertEquals("Invalid sent message", message, service.messageSent);
     }
 
     protected class DatagramServiceMOCK extends DatagramService {

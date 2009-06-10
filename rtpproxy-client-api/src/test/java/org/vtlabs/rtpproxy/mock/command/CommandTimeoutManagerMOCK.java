@@ -30,7 +30,6 @@ public class CommandTimeoutManagerMOCK extends CommandTimeoutManager {
         assertNotNull("Command callback listener is null",
                 command.getCallbackListener());
         assertNotNull("Command listener is null", command.getListener());
-        assertNotNull("Command server is null", command.getServer());
         assertNotNull("Command cookie is null", command.getCookie());
         assertNotNull("Command session ID is null", command.getSessionID());
 

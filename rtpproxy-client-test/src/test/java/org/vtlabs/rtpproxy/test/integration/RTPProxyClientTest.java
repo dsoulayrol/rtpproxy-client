@@ -29,8 +29,11 @@ public class RTPProxyClientTest implements RTPProxyClientListener {
     private RTPProxySession session;
     private boolean wasCreateTimeout;
     private boolean wasUpdateTimeout;
+    private boolean wasDestroyTimeout;
     private boolean wasCreateFailed;
     private boolean wasUpdateFailed;
+    private boolean wasDestroyFailed;
+    private boolean wasDestroyed;
 
     @BeforeClass
     public static void initClass() {
@@ -53,10 +56,8 @@ public class RTPProxyClientTest implements RTPProxyClientListener {
         Object appData = new Object();
 
         log.info("Creating new session. SessionID = " + sessionID);
-        client.createSession(sessionID, appData, this);
-
         synchronized (this) {
-            // We'll be notified when some callback method was called.
+            client.createSession(sessionID, appData, this);
             wait();
         }
 
@@ -86,10 +87,8 @@ public class RTPProxyClientTest implements RTPProxyClientListener {
         Object appData = new Object();
 
         log.info("Creating new session. SessionID = " + sessionID);
-        client.createSession(sessionID, appData, this);
-
         synchronized (this) {
-            // We'll be notified when some callback method was called.
+            client.createSession(sessionID, appData, this);
             wait();
         }
 
@@ -98,6 +97,46 @@ public class RTPProxyClientTest implements RTPProxyClientListener {
         assertTrue("Listener didn't receive timeout callback",
                 wasCreateTimeout);
     }
+
+    /**
+     * Test the creation and destruction of a session using a RTPProxy server
+     * bound to localhost:22222.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void createAndDestroySession() throws Exception {
+        config = RTPProxyClientConfigurator.load("127.0.0.1:22222");
+        client = new RTPProxyClient(config);
+        String sessionID = UUID.randomUUID().toString();
+        Object appData = new Object();
+
+        log.info("Creating new session. SessionID = " + sessionID);
+        synchronized (this) {
+            client.createSession(sessionID, appData, this);
+            // We'll be notified when some callback method was called.
+            wait();
+        }
+
+        assertNotNull("Session wasn't created", session);
+
+        assertNotNull("Callee media address wasn't created",
+                session.getCalleeMediaAddress());
+
+        assertNotNull("Caller media address wasn't created",
+                session.getCallerMediaAddress());
+
+        log.info("Destroying session " + session);
+        synchronized (this) {
+            client.destroySession(session, appData, this);
+            wait();
+        }
+
+        assertTrue("Listener didn't receive destroy callback", wasDestroyed);
+
+        client.terminate();
+    }
+
 
     //
     // Callback methods implemented from RTPProxyClientListener
@@ -150,5 +189,20 @@ public class RTPProxyClientTest implements RTPProxyClientListener {
         synchronized (this) {
             notify();
         }
+    }
+
+    public void sessionDestroyed(RTPProxySession session, Object appData) {
+        wasDestroyed = true;
+        wakeup();
+    }
+
+    public void destroySessionTimeout(RTPProxySession session, Object appData) {
+        wasDestroyTimeout = true;
+        wakeup();
+    }
+
+    public void destroySessionFailed(RTPProxySession session, Object appData, Throwable t) {
+        wasDestroyFailed = true;
+        wakeup();
     }
 }
