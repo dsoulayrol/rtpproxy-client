@@ -40,7 +40,7 @@ public class RTPProxyClientTest implements RTPProxyClientListener {
     }
 
     /**
-     * Test the creation of a session using a RTPProxy server binded to
+     * Test the creation of a session using a RTPProxy server bound to
      * localhost:22222.
      *
      * @throws java.lang.Exception
