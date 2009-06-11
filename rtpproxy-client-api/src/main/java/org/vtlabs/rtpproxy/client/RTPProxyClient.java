@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import org.vtlabs.rtpproxy.command.CommandTimeoutManager;
 import org.vtlabs.rtpproxy.callback.CallbackHandler;
+import org.vtlabs.rtpproxy.command.Command;
 import org.vtlabs.rtpproxy.command.DestroyCommand;
 import org.vtlabs.rtpproxy.command.UpdateCommand;
 import org.vtlabs.rtpproxy.scheduler.RTPProxyScheduler;
@@ -95,11 +96,7 @@ public class RTPProxyClient {
         RTPProxyServer server = scheduler.getNextServer();
         updateCmd.setServer(server);
 
-        String message = updateCmd.getMessage();
-        InetSocketAddress serverAddr = server.getAddress();
-
-        commandTimeout.addPendingCommand(updateCmd);
-        udpService.send(message, serverAddr);
+        sendCommand(updateCmd, server.getAddress());
     }
 
     /**
@@ -112,6 +109,24 @@ public class RTPProxyClient {
      */
     public void updateSession(RTPProxySession session, Object appData,
             RTPProxyClientListener listener) throws NoServerAvailableException {
+        updateSession(session, null, appData, listener);
+    }
+
+    /**
+     * Asynchronously create the Caller media address of an existing session and
+     * associate 'srcAddress' as the source address the Caller. That way the
+     * RTPProxy servers doesn't need to wait Caller RTP packets to forward the
+     * Callee packets to him.
+     *
+     * @param session to be updated
+     * @param Application data object, will be passed as argument in the
+     *        callback method.
+     * @param Listener that will receive the callback event.
+     */
+    public void updateSession(RTPProxySession session,
+            InetSocketAddress srcAddress,
+            Object appData, RTPProxyClientListener listener)
+            throws NoServerAvailableException {
 
         checkState();
 
@@ -124,17 +139,12 @@ public class RTPProxyClient {
         // session in the RTPProxy.
         updateCmd.setFromTag("totag");
         updateCmd.setToTag("fromtag");
-        String message = updateCmd.getMessage();
 
-        commandTimeout.addPendingCommand(updateCmd);
-        udpService.send(message, session.getServer().getAddress());
-    }
+        if (srcAddress != null) {
+            updateCmd.setAddress(srcAddress);
+        }
 
-    public void updateSession(RTPProxySession session,
-            InetSocketAddress srcAddress,
-            Object appData, RTPProxyClientListener listener)
-            throws NoServerAvailableException {
-        // TODO [marcoshack] update session with source address
+        sendCommand(updateCmd, session.getServer().getAddress());
     }
 
     /**
@@ -155,11 +165,19 @@ public class RTPProxyClient {
         // the createSession()
         destroyCmd.setFromTag("fromtag");
         destroyCmd.setToTag("totag");
-        String message = destroyCmd.getMessage();
 
-        commandTimeout.addPendingCommand(destroyCmd);
-        udpService.send(message, session.getServer().getAddress());
+        sendCommand(destroyCmd, session.getServer().getAddress());
     }
+
+    /**
+     * Add the command to the {@link CommandTimeoutManager} and send it to the
+     * given server address using the {@link DatagramService}.
+     */
+    protected void sendCommand(Command command, InetSocketAddress serverAddr) {
+        commandTimeout.addPendingCommand(command);
+        udpService.send(command.getMessage(), serverAddr);
+    }
+
 
     /**
      * Get RTPProxyClient configuration.
