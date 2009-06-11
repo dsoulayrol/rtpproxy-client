@@ -1,5 +1,7 @@
 package org.vtlabs.rtpproxy.client;
 
+import org.vtlabs.rtpproxy.config.RTPProxyClientConfigException;
+import org.vtlabs.rtpproxy.config.RTPProxyClientConfig;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -8,6 +10,8 @@ import org.vtlabs.rtpproxy.command.CommandTimeoutManager;
 import org.vtlabs.rtpproxy.callback.CallbackHandler;
 import org.vtlabs.rtpproxy.command.DestroyCommand;
 import org.vtlabs.rtpproxy.command.UpdateCommand;
+import org.vtlabs.rtpproxy.scheduler.RTPProxyScheduler;
+import org.vtlabs.rtpproxy.scheduler.RTPProxySchedulerFactory;
 import org.vtlabs.rtpproxy.udp.DatagramListener;
 import org.vtlabs.rtpproxy.udp.DatagramService;
 
@@ -23,6 +27,7 @@ public class RTPProxyClient {
     protected CallbackHandler callbackHandler;
     protected ScheduledThreadPoolExecutor executor;
     protected RTPProxyClientConfig config;
+    protected RTPProxyScheduler scheduler;
     protected boolean isTerminated;
 
     public RTPProxyClient(RTPProxyClientConfig config)
@@ -32,6 +37,7 @@ public class RTPProxyClient {
         commandTimeout = createCommandTimeoutManager(executor, config.getCommandTimeout());
         callbackHandler = createCallbackHandler(commandTimeout);
         udpService = createDatagraService(config.getBindPort(), callbackHandler);
+        scheduler = createScheduler(config.getSchedulerName(), config.getServerList());
     }
 
     /**
@@ -46,7 +52,6 @@ public class RTPProxyClient {
                 udpService.stop();
                 commandTimeout.terminate();
                 executor.shutdownNow();
-
             } else {
                 throw new RTPProxyClientTerminatedException(
                         "RTPProxyClient instance is already terminated.");
@@ -87,7 +92,7 @@ public class RTPProxyClient {
         updateCmd.setFromTag("fromtag");
 
         // Get a server to handle the request and set it to the update command
-        RTPProxyServer server = getServer();
+        RTPProxyServer server = scheduler.getNextServer();
         updateCmd.setServer(server);
 
         String message = updateCmd.getMessage();
@@ -125,6 +130,13 @@ public class RTPProxyClient {
         udpService.send(message, session.getServer().getAddress());
     }
 
+    public void updateSession(RTPProxySession session,
+            InetSocketAddress srcAddress,
+            Object appData, RTPProxyClientListener listener)
+            throws NoServerAvailableException {
+        // TODO [marcoshack] update session with source address
+    }
+
     /**
      * Asynchronously destroy the given RTPProxySession releasing all resources
      * in the RTPProxy server.
@@ -159,24 +171,6 @@ public class RTPProxyClient {
     }
 
     /**
-     * Get the next avaiable RTPProxy server to be used.
-     *
-     * @return
-     * @throws org.vtlabs.rtpproxy.client.NoServerAvailableException if there
-     *         aren't servers available.
-     */
-    protected RTPProxyServer getServer() throws NoServerAvailableException {
-        // TODO [marcoshack] RTPProxy servers load balance algorithm
-        List<RTPProxyServer> serverList = config.getServerList();
-
-        if (serverList.size() > 0) {
-            return serverList.get(0);
-        } else {
-            throw new NoServerAvailableException("Server list is empty");
-        }
-    }
-
-    /**
      * Check if the RTPProxyClient instance is able to provide the service.
      * Basically it checks if the instance was terminated.
      *
@@ -190,7 +184,7 @@ public class RTPProxyClient {
     }
 
     /**
-     * Factory method to create CommandManager.
+     * Factory method to create a {@link CommandTimeoutManager}.
      *
      * @return
      */
@@ -200,7 +194,7 @@ public class RTPProxyClient {
     }
 
     /**
-     * Factory method to create DatagramService.
+     * Factory method to create a {@link DatagramService}.
      *
      * @return
      */
@@ -210,7 +204,7 @@ public class RTPProxyClient {
     }
 
     /**
-     * Factory method to create RTPClientResponseHandler.
+     * Factory method to create a {@link RTPClientResponseHandler}.
      *
      * @return
      */
@@ -220,12 +214,22 @@ public class RTPProxyClient {
     }
 
     /**
-     * Factory method to create ScheduledThreadPoolExecutor.
+     * Factory method to create a {@link ScheduledThreadPoolExecutor}.
      *
      * @return
      */
     protected ScheduledThreadPoolExecutor createThreadPoolExecutor(
             int poolSize) {
         return new ScheduledThreadPoolExecutor(poolSize);
+    }
+
+    /**
+     * Factory method to create a {@link RTPProxyScheduler}.
+     * 
+     * @return
+     */
+    protected RTPProxyScheduler createScheduler(String schedulerName,
+            List<RTPProxyServer> servers) throws RTPProxyClientConfigException {
+        return RTPProxySchedulerFactory.createScheduler(schedulerName, servers);
     }
 }

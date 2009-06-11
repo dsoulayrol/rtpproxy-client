@@ -9,6 +9,13 @@ import java.net.InetSocketAddress;
 public class RTPProxyServer {
     private InetSocketAddress address;
 
+    public RTPProxyServer() {
+    }
+
+    public RTPProxyServer(InetSocketAddress serverAddress) {
+        address = serverAddress;
+    }
+
     public InetSocketAddress getAddress() {
         return address;
     }

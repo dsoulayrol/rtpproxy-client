@@ -2,10 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.vtlabs.rtpproxy.client;
+package org.vtlabs.rtpproxy.config;
 
+import org.vtlabs.rtpproxy.client.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.vtlabs.rtpproxy.scheduler.RTPProxyScheduler;
 
 /**
  *
@@ -27,17 +29,24 @@ public class RTPProxyClientConfig {
      * Default timeout, in millisendocs, for sent commands to RTPProxy.
      */
     public static final int DEFAULT_COMMAND_TIMEOUT = 5000;
+
+    /**
+     * Default server scheduler: static ({@link RTPProxyStaticScheduler}).
+     */
+    public static final String DEFAULT_SCHEDULER_NAME = "static";
     
     private int bindPort;
     private int poolSize;
     private List<RTPProxyServer> serverList;
     private long commandTimeout;
+    private String schedulerName;
 
     public RTPProxyClientConfig() {
         serverList = new ArrayList<RTPProxyServer>();
         setBindPort(DEFAULT_BIND_PORT);
         setPoolSize(DEFAULT_SCHEDULED_POOL_SIZE);
         setCommandTimeout(DEFAULT_COMMAND_TIMEOUT);
+        setSchedulerName(DEFAULT_SCHEDULER_NAME);
     }
 
     public int getBindPort() {
@@ -74,5 +83,13 @@ public class RTPProxyClientConfig {
 
     public void setCommandTimeout(long commandTimeout) {
         this.commandTimeout = commandTimeout;
+    }
+
+    public String getSchedulerName() {
+        return schedulerName;
+    }
+
+    public void setSchedulerName(String schedulerName) {
+        this.schedulerName = schedulerName;
     }
 }

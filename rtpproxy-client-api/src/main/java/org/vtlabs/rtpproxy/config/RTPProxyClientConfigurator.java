@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.vtlabs.rtpproxy.client;
+package org.vtlabs.rtpproxy.config;
 
+import org.vtlabs.rtpproxy.client.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -20,6 +21,7 @@ public class RTPProxyClientConfigurator {
     public static final String CONFIG_PROPERTY = "org.vtlabs.rtpproxy.config";
     public static final String BIND_PORT_PROPERTY = "org.vtlabs.rtpproxy.bindport";
     public static final String SERVER_LIST_PROPERTY = "org.vtlabs.rtpproxy.servers";
+    public static final String SERVER_SCHEDULER_PROPERTY = "org.vtlabs.rtpproxy.scheduler";
     public static final String POOL_SIZE_PROPERTY = "org.vtlabs.rtpproxy.poolsize";
 
     private RTPProxyClientConfigurator() {}
@@ -77,6 +79,12 @@ public class RTPProxyClientConfigurator {
         if (strPoolSize != null) {
             int poolSize = Integer.parseInt(strPoolSize);
             config.setPoolSize(poolSize);
+        }
+
+        // RTPProxy server Scheduler
+        String schedulerName = propList.getProperty(SERVER_SCHEDULER_PROPERTY);
+        if (schedulerName != null) {
+            config.setSchedulerName(schedulerName);
         }
 
         // Server List
