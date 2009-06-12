@@ -65,20 +65,47 @@ public class RTPProxyClient {
     }
 
     /**
-     * Asynchronously create a new RTPProxy session filled only with the Callee
-     * media address.
+     * Asynchronously create a new session containing the Callee media address.
+     * This method doesn't pre-fill caller's address so RTPProxy server will
+     * wait for caller's RTP packets before forwarding callee RTP packets to
+     * him.
      * 
      * To create the Caller media address of an existing session use the method
      * updateSession().
      *
      * @param String to be used as session ID.
      * @param Application data object, will be passed as argument in the
-     *        callback method.
-     * @param Listener that will receive the callback event.
-     * @see RTPProxyClientListener
+     *        callback method, it isn't used internally.
+     * @param Listener that will receive the callback events for this command.
+     *        (see {@link RTPProxyClientListener} for more information about
+     *        callback methods).
      */
     public void createSession(String sessionID, Object appData,
             RTPProxyClientListener listener) throws NoServerAvailableException {
+
+        createSession(sessionID, null, appData, listener);
+    }
+
+     /**
+     * Asynchronously create a new session containing the Callee media address
+     * pre-filling caller's address with the given 'callerAddress'. That way the
+     * RTPProxy servers doesn't need to wait caller's RTP packets to arrive
+     * before start forwarding the callee's RTP packets to him.
+     *
+     * To create the Caller media address of an existing session use the method
+     * updateSession().
+     *
+     * @param String to be used as session ID.
+     * @param Caller's media address to be pre-filled in the new session
+     * @param Application data object, will be passed as argument in the
+     *        callback method, it isn't used internally.
+     * @param Listener that will receive the callback events for this command.
+     *        (see {@link RTPProxyClientListener} for more information about
+     *        callback methods).
+     */
+    public void createSession(String sessionID, InetSocketAddress callerAddress,
+            Object appData, RTPProxyClientListener listener)
+            throws NoServerAvailableException {
 
         checkState();
 
@@ -87,10 +114,14 @@ public class RTPProxyClient {
         updateCmd.setCallbackListener(listener);
         updateCmd.setListener(callbackHandler);
 
-        // No matter the fromtag content since it matchs that used in the
-        // updateSession() method below to link the callee and caller session in
-        // the RTPProxy.
+        // The fromtag and totag doesn't matter since they match that used in
+        // the updateSession() method below to link the callee and caller
+        // session in the RTPProxy.
         updateCmd.setFromTag("fromtag");
+
+        if (callerAddress != null) {
+            updateCmd.setAddress(callerAddress);
+        }
 
         // Get a server to handle the request and set it to the update command
         RTPProxyServer server = scheduler.getNextServer();
@@ -99,13 +130,19 @@ public class RTPProxyClient {
         sendCommand(updateCmd, server.getAddress());
     }
 
+
     /**
-     * Asynchronously create the Caller media address of an existing session.
+     * Asynchronously update an existing session to create the Caller media
+     * address. This method doesn't pre-fill callee's address so RTPProxy server
+     * will wait for callee's RTP packets before start forwarding caller's RTP
+     * packets to him.
      *
-     * @param session to be updated
+     * @param Session to be updated.
      * @param Application data object, will be passed as argument in the
-     *        callback method.
-     * @param Listener that will receive the callback event.
+     *        callback method, it isn't used internally.
+     * @param Listener that will receive the callback events for this command.
+     *        (see {@link RTPProxyClientListener} for more information about
+     *        callback methods).
      */
     public void updateSession(RTPProxySession session, Object appData,
             RTPProxyClientListener listener) throws NoServerAvailableException {
@@ -113,18 +150,21 @@ public class RTPProxyClient {
     }
 
     /**
-     * Asynchronously create the Caller media address of an existing session and
-     * associate 'srcAddress' as the source address the Caller. That way the
-     * RTPProxy servers doesn't need to wait Caller RTP packets to forward the
-     * Callee packets to him.
+     * Asynchronously update an existing session to create the Caller media
+     * address pre-filling callee's address with 'calleeAddress'. That way the
+     * RTPProxy servers doesn't need to wait callee's RTP packets to arrive
+     * before start forwarding caller's RTP packets to him.
      *
      * @param session to be updated
+     * @param Callee's media address to be pre-filled
      * @param Application data object, will be passed as argument in the
-     *        callback method.
-     * @param Listener that will receive the callback event.
+     *        callback method, it isn't used internally.
+     * @param Listener that will receive the callback events for this command.
+     *        (see {@link RTPProxyClientListener} for more information about
+     *        callback methods).
      */
     public void updateSession(RTPProxySession session,
-            InetSocketAddress srcAddress,
+            InetSocketAddress calleeAddress,
             Object appData, RTPProxyClientListener listener)
             throws NoServerAvailableException {
 
@@ -134,24 +174,29 @@ public class RTPProxyClient {
         updateCmd.setCallbackListener(listener);
         updateCmd.setServer(session.getServer());
 
-        // No matter the fromtag and totag content since it matchs that used in
+        // The fromtag and totag doesn't matter since they match that used in
         // the createSession() method above to link the callee and caller
         // session in the RTPProxy.
         updateCmd.setFromTag("totag");
         updateCmd.setToTag("fromtag");
 
-        if (srcAddress != null) {
-            updateCmd.setAddress(srcAddress);
+        if (calleeAddress != null) {
+            updateCmd.setAddress(calleeAddress);
         }
 
         sendCommand(updateCmd, session.getServer().getAddress());
     }
 
     /**
-     * Asynchronously destroy the given RTPProxySession releasing all resources
-     * in the RTPProxy server.
+     * Asynchronously destroy the given session releasing all resources in the
+     * RTPProxy server.
      *
      * @param Session to be destroyed.
+     * @param Application data object, will be passed as argument in the
+     *        callback method, it isn't used internally.
+     * @param Listener that will receive the callback events for this command.
+     *        (see {@link RTPProxyClientListener} for more information about
+     *        callback methods).
      */
     public void destroySession(RTPProxySession session, Object appData,
             RTPProxyClientListener listener) throws NoServerAvailableException {
@@ -161,8 +206,8 @@ public class RTPProxyClient {
         DestroyCommand destroyCmd = new DestroyCommand(session, callbackHandler);
         destroyCmd.setCallbackListener(listener);
 
-        // The fromtag and totag doesn't matter since it matchs that used in
-        // the createSession()
+        // The fromtag and totag doesn't matter since they match that used in
+        // the createSession() and updateSession() methods.
         destroyCmd.setFromTag("fromtag");
         destroyCmd.setToTag("totag");
 

@@ -9,13 +9,10 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import org.junit.Before;
 import org.junit.Test;
-import org.vtlabs.rtpproxy.client.RTPProxyClient;
+import org.vtlabs.rtpproxy.command.Command;
 import org.vtlabs.rtpproxy.config.RTPProxyClientConfig;
 import org.vtlabs.rtpproxy.config.RTPProxyClientConfigException;
 import org.vtlabs.rtpproxy.config.RTPProxyClientConfigurator;
-import org.vtlabs.rtpproxy.client.RTPProxyClientListener;
-import org.vtlabs.rtpproxy.client.RTPProxyServer;
-import org.vtlabs.rtpproxy.client.RTPProxySession;
 import org.vtlabs.rtpproxy.command.CommandTimeoutManager;
 import org.vtlabs.rtpproxy.command.DestroyCommand;
 import org.vtlabs.rtpproxy.command.UpdateCommand;
@@ -50,16 +47,8 @@ public class RTPProxyClientTest {
 
         client.createSession(sessionID, appData, listener);
 
-        
-        CommandTimeoutManagerMOCK timeout = client.getCommandTimeoutManager();
-        UpdateCommand command = (UpdateCommand) timeout.pendingCommand;
-
-        // Asserts
-        assertNotNull("Update command wasn't added to timeout manager",
-                command);
-
-        DatagramServiceMOCK udpService = client.getDatagramService();
-        assertNotNull("Invalid sent message", udpService.sentMessage);
+        // TODO [marcoshack] assert command attributes
+        UpdateCommand command = (UpdateCommand)assertCommons();
     }
 
     @Test
@@ -74,15 +63,8 @@ public class RTPProxyClientTest {
 
         client.updateSession(session, appData, listener);
 
-        CommandTimeoutManagerMOCK timeout = client.getCommandTimeoutManager();
-        UpdateCommand command = (UpdateCommand) timeout.pendingCommand;
-
-        // Asserts
-        assertNotNull("Update command wasn't added to timeout manager",
-                command);
-
-        DatagramServiceMOCK udpService = client.getDatagramService();
-        assertNotNull("Invalid sent message", udpService.sentMessage);
+        // TODO [marcoshack] assert command attributes
+        UpdateCommand command = (UpdateCommand)assertCommons();
     }
 
     @Test
@@ -97,17 +79,35 @@ public class RTPProxyClientTest {
 
         client.destroySession(session, appData, listener);
 
+        // TODO [marcoshack] assert command attributes
+        DestroyCommand command = (DestroyCommand)assertCommons();
+    }
+
+    /**
+     * Commons asserts for RTPProxyClient tests.
+     *
+     * @return Command created by the test method.
+     */
+    protected Command assertCommons() {
         CommandTimeoutManagerMOCK timeout = client.getCommandTimeoutManager();
-        DestroyCommand command = (DestroyCommand) timeout.pendingCommand;
+        Command command = timeout.pendingCommand;
 
         // Asserts
-        assertNotNull("Update command wasn't added to timeout manager",
+        assertNotNull("Command wasn't added to timeout manager",
                 command);
 
         DatagramServiceMOCK udpService = client.getDatagramService();
         assertNotNull("Invalid sent message", udpService.sentMessage);
+
+        assertEquals("Invalid callback listener", listener,
+                command.getCallbackListener());
+
+        return command;
     }
 
+    /**
+     * RTPProxyClient MOCK class used in these tests.
+     */
     protected class RTPProxyClientMOCK extends RTPProxyClient {
 
         public RTPProxyClientMOCK(RTPProxyClientConfig config)
