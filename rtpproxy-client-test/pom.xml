@@ -10,7 +10,7 @@
     <artifactId>rtpproxy-client-test</artifactId>
     <name>RTPProxy Client Test</name>
     <description>RTPProxy Client Integration Testing</description>
-    <version>0.1</version>
+    <version>0.2</version>
     <packaging>jar</packaging>
     <url>http://rtpproxy-client.googlecode.com/</url>
 

@@ -113,6 +113,7 @@ public class RTPProxyClient {
         updateCmd.setSessionID(sessionID);
         updateCmd.setCallbackListener(listener);
         updateCmd.setListener(callbackHandler);
+        updateCmd.setAppData(appData);
 
         // The fromtag and totag doesn't matter since they match that used in
         // the updateSession() method below to link the callee and caller
@@ -173,6 +174,7 @@ public class RTPProxyClient {
         UpdateCommand updateCmd = new UpdateCommand(session, callbackHandler);
         updateCmd.setCallbackListener(listener);
         updateCmd.setServer(session.getServer());
+        updateCmd.setAppData(appData);
 
         // The fromtag and totag doesn't matter since they match that used in
         // the createSession() method above to link the callee and caller
