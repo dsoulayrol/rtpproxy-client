@@ -48,7 +48,7 @@ public class RTPProxyClientTest {
         client.createSession(sessionID, appData, listener);
 
         // TODO [marcoshack] assert command attributes
-        UpdateCommand command = (UpdateCommand)assertCommons();
+        UpdateCommand command = (UpdateCommand)assertCommons(appData);
     }
 
     @Test
@@ -64,7 +64,7 @@ public class RTPProxyClientTest {
         client.updateSession(session, appData, listener);
 
         // TODO [marcoshack] assert command attributes
-        UpdateCommand command = (UpdateCommand)assertCommons();
+        UpdateCommand command = (UpdateCommand)assertCommons(appData);
     }
 
     @Test
@@ -80,7 +80,7 @@ public class RTPProxyClientTest {
         client.destroySession(session, appData, listener);
 
         // TODO [marcoshack] assert command attributes
-        DestroyCommand command = (DestroyCommand)assertCommons();
+        DestroyCommand command = (DestroyCommand)assertCommons(appData);
     }
 
     /**
@@ -88,7 +88,7 @@ public class RTPProxyClientTest {
      *
      * @return Command created by the test method.
      */
-    protected Command assertCommons() {
+    protected Command assertCommons(Object appData) {
         CommandTimeoutManagerMOCK timeout = client.getCommandTimeoutManager();
         Command command = timeout.pendingCommand;
 
@@ -102,6 +102,8 @@ public class RTPProxyClientTest {
         assertEquals("Invalid callback listener", listener,
                 command.getCallbackListener());
 
+        assertEquals("Invalid AppData", appData, command.getAppData());
+        
         return command;
     }
 

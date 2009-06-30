@@ -3,14 +3,14 @@
     <parent>
         <artifactId>rtpproxy-client</artifactId>
         <groupId>org.vtlabs</groupId>
-        <version>0.1</version>
+        <version>0.1.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.vtlabs</groupId>
     <artifactId>rtpproxy-client-test</artifactId>
     <name>RTPProxy Client Test</name>
     <description>RTPProxy Client Integration Testing</description>
-    <version>0.1</version>
+    <version>0.1.1</version>
     <packaging>jar</packaging>
     <url>http://rtpproxy-client.googlecode.com/</url>
 
@@ -18,7 +18,7 @@
         <dependency>
             <groupId>org.vtlabs</groupId>
             <artifactId>rtpproxy-client-api</artifactId>
-            <version>0.1</version>
+            <version>0.1.1</version>
         </dependency>
     </dependencies>
 </project>
