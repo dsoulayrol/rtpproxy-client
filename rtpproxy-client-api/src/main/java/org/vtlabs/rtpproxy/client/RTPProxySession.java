@@ -2,56 +2,15 @@ package org.vtlabs.rtpproxy.client;
 
 import java.net.InetSocketAddress;
 
-/**
- *
- * @author Marcos Hack <marcosh@voicetechnology.com.br>
- */
-public class RTPProxySession {
-    private String sessionID;
-    private InetSocketAddress callerMediaAddress;
-    private InetSocketAddress calleeMediaAddress;
-    private RTPProxyServer server;
+public interface RTPProxySession {
 
-    public InetSocketAddress getCalleeMediaAddress() {
-        return calleeMediaAddress;
-    }
+	public InetSocketAddress getCalleeMediaAddress();
 
-    public void setCalleeMediaAddress(InetSocketAddress calleeMediaAddress) {
-        this.calleeMediaAddress = calleeMediaAddress;
-    }
+	public InetSocketAddress getCallerMediaAddress();
 
-    public InetSocketAddress getCallerMediaAddress() {
-        return callerMediaAddress;
-    }
+	public RTPProxyServer getServer();
 
-    public void setCallerMediaAddress(InetSocketAddress callerMediaAddress) {
-        this.callerMediaAddress = callerMediaAddress;
-    }
+	public String getSessionID();
 
-    public RTPProxyServer getServer() {
-        return server;
-    }
-
-    public void setServer(RTPProxyServer server) {
-        this.server = server;
-    }
-
-    public String getSessionID() {
-        return sessionID;
-    }
-
-    public void setSessionID(String sessionID) {
-        this.sessionID = sessionID;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder("RTPProxySession[");
-        sb.append("sessionID = ").append(sessionID);
-        sb.append(", calleeMediaAddress = ").append(calleeMediaAddress);
-        sb.append(", callerMediaAddress = ").append(callerMediaAddress);
-        sb.append(", server = ").append(server);
-        sb.append("]");
-        return sb.toString();
-    }
+	public RTPProxySessionState getState();
 }

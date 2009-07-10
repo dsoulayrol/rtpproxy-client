@@ -7,8 +7,9 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vtlabs.rtpproxy.client.RTPProxyClientListener;
-import org.vtlabs.rtpproxy.client.RTPProxySession;
+import org.vtlabs.rtpproxy.client.RTPProxySessionImpl;
 import org.vtlabs.rtpproxy.client.RTPProxySessionException;
+import org.vtlabs.rtpproxy.client.RTPProxySessionState;
 import org.vtlabs.rtpproxy.command.Command;
 import org.vtlabs.rtpproxy.command.CommandListener;
 import org.vtlabs.rtpproxy.command.CommandTimeoutManager;
@@ -80,7 +81,7 @@ public class CallbackHandler implements DatagramListener, CommandListener {
             log.debug(sb.toString());
         }
 
-        RTPProxySession session = command.getSession();
+        RTPProxySessionImpl session = command.getSession();
         boolean isError = errorMatcher.reset(message).matches();
 
         if (session == null && isError) {
@@ -117,12 +118,13 @@ public class CallbackHandler implements DatagramListener, CommandListener {
             log.debug(sb.toString());
         }
 
-        RTPProxySession session = command.getSession();
+        RTPProxySessionImpl session = command.getSession();
         RTPProxyClientListener listener = command.getCallbackListener();
         Object appData = command.getAppData();
         boolean isError = errorMatcher.reset(message).matches();
 
         if (!isError) {
+        	session.setState(RTPProxySessionState.DESTROYED);
             listener.sessionDestroyed(session, appData);
 
         } else {
@@ -130,6 +132,7 @@ public class CallbackHandler implements DatagramListener, CommandListener {
                     "Error destroying RTPProxy session",
                     message);
             
+            session.setState(RTPProxySessionState.FAILED);
             listener.destroySessionFailed(session, appData, t);
         }
     }
@@ -163,9 +166,10 @@ public class CallbackHandler implements DatagramListener, CommandListener {
             String message) {
         log.debug("Processing event SessionCreated");
 
-        RTPProxySession session = new RTPProxySession();
+        RTPProxySessionImpl session = new RTPProxySessionImpl();
         session.setSessionID(command.getSessionID());
         session.setServer(command.getServer());
+        session.setState(RTPProxySessionState.CREATED);
 
         InetSocketAddress calleeMediaAddr = parseMediaAddress(message);
         session.setCalleeMediaAddress(calleeMediaAddr);
@@ -193,9 +197,10 @@ public class CallbackHandler implements DatagramListener, CommandListener {
         Throwable t = createSessionException("Error updating RTPProxy session",
                 errorMessage);
 
+        RTPProxySessionImpl session = command.getSession();
+        session.setState(RTPProxySessionState.FAILED);
         RTPProxyClientListener listener = command.getCallbackListener();
-        listener.updateSessionFailed(command.getSession(), command.getAppData(),
-                t);
+        listener.updateSessionFailed(session, command.getAppData(), t);
     }
 
     /**
@@ -207,7 +212,7 @@ public class CallbackHandler implements DatagramListener, CommandListener {
             String message) {
         log.debug("Processing event SessionUpdated");
 
-        RTPProxySession session = command.getSession();
+        RTPProxySessionImpl session = command.getSession();
         InetSocketAddress callerMediaAddr = parseMediaAddress(message);
         session.setCallerMediaAddress(callerMediaAddr);
 
@@ -254,13 +259,14 @@ public class CallbackHandler implements DatagramListener, CommandListener {
      */
     public void processUpdateCommandTimeout(UpdateCommand command) {
         RTPProxyClientListener listener = command.getCallbackListener();
-        RTPProxySession session = command.getSession();
+        RTPProxySessionImpl session = command.getSession();
         Object appData = command.getAppData();
         String sessionID = command.getSessionID();
 
         if (session == null) {
             listener.createSessionTimeout(sessionID, appData);
         } else {
+        	session.setState(RTPProxySessionState.FAILED);
             listener.updateSessionTimeout(session, appData);
         }
     }
@@ -270,7 +276,8 @@ public class CallbackHandler implements DatagramListener, CommandListener {
      */
     public void processDestroyCommandTimeout(DestroyCommand command) {
         RTPProxyClientListener listener = command.getCallbackListener();
-        RTPProxySession session = command.getSession();
+        RTPProxySessionImpl session = command.getSession();
+        session.setState(RTPProxySessionState.FAILED);
         Object appData = command.getAppData();
         listener.destroySessionTimeout(session, appData);
     }

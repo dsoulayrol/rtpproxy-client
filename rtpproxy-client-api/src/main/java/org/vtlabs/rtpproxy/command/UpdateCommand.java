@@ -2,7 +2,7 @@ package org.vtlabs.rtpproxy.command;
 
 import java.net.InetSocketAddress;
 import org.vtlabs.rtpproxy.client.RTPProxyServer;
-import org.vtlabs.rtpproxy.client.RTPProxySession;
+import org.vtlabs.rtpproxy.client.RTPProxySessionImpl;
 
 /**
  * Update sesssion, creating a new one if it doesn't exist.
@@ -17,7 +17,7 @@ public class UpdateCommand extends Command {
      * RTPProxy session target of the update command. Its is 'null' in the first
      * update command used to create the session.
      */
-    private RTPProxySession session;
+    private RTPProxySessionImpl session;
 
     /**
      * RTPProxy server to which the command will be send. Its primary use is to
@@ -32,7 +32,7 @@ public class UpdateCommand extends Command {
         address = null;
     }
 
-    public UpdateCommand(RTPProxySession session, CommandListener cmdListener) {
+    public UpdateCommand(RTPProxySessionImpl session, CommandListener cmdListener) {
         this(cmdListener);
         this.session = session;
         setSessionID(session.getSessionID());
@@ -73,11 +73,11 @@ public class UpdateCommand extends Command {
         this.address = address;
     }
 
-    public RTPProxySession getSession() {
+    public RTPProxySessionImpl getSession() {
         return session;
     }
 
-    public void setSession(RTPProxySession session) {
+    public void setSession(RTPProxySessionImpl session) {
         this.session = session;
     }
 

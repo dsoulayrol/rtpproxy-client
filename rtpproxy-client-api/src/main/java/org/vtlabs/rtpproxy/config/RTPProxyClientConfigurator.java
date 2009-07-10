@@ -6,8 +6,10 @@ package org.vtlabs.rtpproxy.config;
 
 import org.vtlabs.rtpproxy.client.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
@@ -29,9 +31,9 @@ public class RTPProxyClientConfigurator {
     public static RTPProxyClientConfig load(File configFile)
             throws RTPProxyClientConfigException {
         try {
-            FileReader reader = new FileReader(configFile);
+            FileInputStream fileInputStream = new FileInputStream(configFile);
             Properties configProperties = new Properties();
-            configProperties.load(reader);
+            configProperties.load(fileInputStream);
 
             return load(configProperties);
 

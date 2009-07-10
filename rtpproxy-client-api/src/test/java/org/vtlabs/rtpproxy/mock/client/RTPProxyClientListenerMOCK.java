@@ -6,6 +6,7 @@ package org.vtlabs.rtpproxy.mock.client;
 
 import org.vtlabs.rtpproxy.client.RTPProxyClientListener;
 import org.vtlabs.rtpproxy.client.RTPProxySession;
+import org.vtlabs.rtpproxy.client.RTPProxySessionImpl;
 
 /**
  *
@@ -22,21 +23,21 @@ public class RTPProxyClientListenerMOCK
     public Object createFailedAppData;
     public Object createFailedThrowable;
     public boolean isUpdateFail;
-    public RTPProxySession updateFailedSession;
+    public RTPProxySessionImpl updateFailedSession;
     public Object updateFailedAppData;
     public Object updateFailedThrowable;
     public boolean isDestroyFail;
-    public RTPProxySession destroyFailedSession;
+    public RTPProxySessionImpl destroyFailedSession;
     public Object destroyFailedAppData;
     public Object destroyFailedThrowable;
     public boolean isCreate;
-    public RTPProxySession createdSession;
+    public RTPProxySessionImpl createdSession;
     public Object createdAppData;
     public boolean isUpdate;
-    public RTPProxySession updatedSession;
+    public RTPProxySessionImpl updatedSession;
     public Object updatedAppData;
     public boolean isDestroy;
-    public RTPProxySession destroySession;
+    public RTPProxySessionImpl destroySession;
     public Object destroyAppData;
 
     public void createSessionTimeout(String sessionID, Object appData) {
@@ -56,7 +57,7 @@ public class RTPProxyClientListenerMOCK
     public void updateSessionFailed(RTPProxySession session, Object appData,
             Throwable t) {
         isUpdateFail = true;
-        updateFailedSession = session;
+        updateFailedSession = (RTPProxySessionImpl) session;
         updateFailedAppData = appData;
         updateFailedThrowable = t;
     }
@@ -67,19 +68,19 @@ public class RTPProxyClientListenerMOCK
 
     public void sessionCreated(RTPProxySession session, Object appData) {
         isCreate = true;
-        createdSession = session;
+        createdSession = (RTPProxySessionImpl) session;
         createdAppData = appData;
     }
 
     public void sessionUpdated(RTPProxySession session, Object appData) {
         isUpdate = true;
-        updatedSession = session;
+        updatedSession = (RTPProxySessionImpl) session;
         updatedAppData = appData;
     }
 
     public void destroySessionFailed(RTPProxySession session, Object appData, Throwable t) {
         isDestroyFail = true;
-        destroyFailedSession = session;
+        destroyFailedSession = (RTPProxySessionImpl) session;
         destroyFailedAppData = appData;
         destroyFailedThrowable = t;
     }
@@ -90,7 +91,7 @@ public class RTPProxyClientListenerMOCK
 
     public void sessionDestroyed(RTPProxySession session, Object appData) {
         isDestroy = true;
-        destroySession = session;
+        destroySession = (RTPProxySessionImpl) session;
         destroyAppData = appData;
     }
 }

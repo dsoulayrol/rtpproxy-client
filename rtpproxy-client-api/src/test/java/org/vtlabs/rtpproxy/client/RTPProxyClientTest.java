@@ -57,7 +57,7 @@ public class RTPProxyClientTest {
         Object appData = new Object();
         RTPProxyServer server = new RTPProxyServer();
         server.setAddress(new InetSocketAddress("127.0.0.1", 22222));
-        RTPProxySession session = new RTPProxySession();
+        RTPProxySessionImpl session = new RTPProxySessionImpl();
         session.setSessionID(sessionID);
         session.setServer(server);
 
@@ -73,7 +73,7 @@ public class RTPProxyClientTest {
         Object appData = new Object();
         RTPProxyServer server = new RTPProxyServer();
         server.setAddress(new InetSocketAddress("127.0.0.1", 22222));
-        RTPProxySession session = new RTPProxySession();
+        RTPProxySessionImpl session = new RTPProxySessionImpl();
         session.setSessionID(sessionID);
         session.setServer(server);
 

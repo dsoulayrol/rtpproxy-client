@@ -164,13 +164,14 @@ public class RTPProxyClient {
      *        (see {@link RTPProxyClientListener} for more information about
      *        callback methods).
      */
-    public void updateSession(RTPProxySession session,
+    public void updateSession(RTPProxySession sessionIface,
             InetSocketAddress calleeAddress,
             Object appData, RTPProxyClientListener listener)
             throws NoServerAvailableException {
 
         checkState();
 
+        RTPProxySessionImpl session = (RTPProxySessionImpl) sessionIface; 
         UpdateCommand updateCmd = new UpdateCommand(session, callbackHandler);
         updateCmd.setCallbackListener(listener);
         updateCmd.setServer(session.getServer());
@@ -200,11 +201,12 @@ public class RTPProxyClient {
      *        (see {@link RTPProxyClientListener} for more information about
      *        callback methods).
      */
-    public void destroySession(RTPProxySession session, Object appData,
+    public void destroySession(RTPProxySession sessionIface, Object appData,
             RTPProxyClientListener listener) throws NoServerAvailableException {
 
         checkState();
 
+        RTPProxySessionImpl session = (RTPProxySessionImpl) sessionIface; 
         DestroyCommand destroyCmd = new DestroyCommand(session, callbackHandler);
         destroyCmd.setCallbackListener(listener);
         destroyCmd.setAppData(appData);

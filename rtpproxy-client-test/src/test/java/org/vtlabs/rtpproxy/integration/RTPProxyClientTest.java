@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vtlabs.rtpproxy.client.NoServerAvailableException;
 import org.vtlabs.rtpproxy.client.RTPProxyClient;
+import org.vtlabs.rtpproxy.client.RTPProxySessionState;
 import org.vtlabs.rtpproxy.config.RTPProxyClientConfig;
 import org.vtlabs.rtpproxy.config.RTPProxyClientConfigurator;
 import org.vtlabs.rtpproxy.client.RTPProxyClientListener;
@@ -69,7 +70,11 @@ public class RTPProxyClientTest implements RTPProxyClientListener {
 
         assertNotNull("Caller media address wasn't created",
                 session.getCallerMediaAddress());
+        
 
+        assertEquals("Invalid session state", RTPProxySessionState.CREATED,
+        		session.getState());
+        
         log.info("Destroying session " + session);
         synchronized (this) {
             client.destroySession(session, appData, this);
@@ -77,6 +82,9 @@ public class RTPProxyClientTest implements RTPProxyClientListener {
         }
 
         assertTrue("Listener didn't receive destroy callback", wasDestroyed);
+        
+        assertEquals("Invalid session state", RTPProxySessionState.DESTROYED,
+        		session.getState());
 
         client.terminate();
     }

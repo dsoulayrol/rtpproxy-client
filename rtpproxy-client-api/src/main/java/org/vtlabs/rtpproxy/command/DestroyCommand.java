@@ -1,6 +1,6 @@
 package org.vtlabs.rtpproxy.command;
 
-import org.vtlabs.rtpproxy.client.RTPProxySession;
+import org.vtlabs.rtpproxy.client.RTPProxySessionImpl;
 
 /**
  *
@@ -8,13 +8,13 @@ import org.vtlabs.rtpproxy.client.RTPProxySession;
  */
 public class DestroyCommand extends Command {
 
-    RTPProxySession session;
+    RTPProxySessionImpl session;
 
     public DestroyCommand(CommandListener cmdListener) {
         super(cmdListener);
     }
 
-    public DestroyCommand(RTPProxySession session, CommandListener listener) {
+    public DestroyCommand(RTPProxySessionImpl session, CommandListener listener) {
         super(listener);
         this.session = session;
         setSessionID(session.getSessionID());
@@ -29,11 +29,11 @@ public class DestroyCommand extends Command {
         return sb.toString();
     }
 
-    public RTPProxySession getSession() {
+    public RTPProxySessionImpl getSession() {
         return session;
     }
 
-    public void setSession(RTPProxySession session) {
+    public void setSession(RTPProxySessionImpl session) {
         this.session = session;
     }
 }
