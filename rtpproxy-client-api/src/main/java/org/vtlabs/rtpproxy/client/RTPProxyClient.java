@@ -207,6 +207,7 @@ public class RTPProxyClient {
 
         DestroyCommand destroyCmd = new DestroyCommand(session, callbackHandler);
         destroyCmd.setCallbackListener(listener);
+        destroyCmd.setAppData(appData);
 
         // The fromtag and totag doesn't matter since they match that used in
         // the createSession() and updateSession() methods.
