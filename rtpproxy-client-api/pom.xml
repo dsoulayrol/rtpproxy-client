@@ -9,7 +9,7 @@
     <groupId>org.vtlabs</groupId>
     <artifactId>rtpproxy-client-api</artifactId>
     <name>RTPProxy Client API</name>
-    <version>0.2</version>
+    <version>0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <url>http://rtpproxy-client.googlecode.com/</url>
     <dependencies>
