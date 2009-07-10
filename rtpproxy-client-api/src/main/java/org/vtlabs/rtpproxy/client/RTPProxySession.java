@@ -13,4 +13,6 @@ public interface RTPProxySession {
 	public String getSessionID();
 
 	public RTPProxySessionState getState();
+	
+	public boolean isActive();
 }

@@ -52,6 +52,10 @@ public class RTPProxySessionImpl implements RTPProxySession {
     public void setState(RTPProxySessionState state) {
     	this.state = state;
     }
+    
+	public boolean isActive() {
+		return getState() == RTPProxySessionState.CREATED;
+	}
 
 	@Override
     public String toString() {
