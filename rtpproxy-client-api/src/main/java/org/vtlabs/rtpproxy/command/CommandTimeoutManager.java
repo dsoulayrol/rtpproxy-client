@@ -54,9 +54,11 @@ public class CommandTimeoutManager {
 
         CommandTimeoutTask timeoutTask = new CommandTimeoutTask(command, this);
         synchronized (timeoutFutureMap) {
-            ScheduledFuture<CommandTimeoutTask> future = (ScheduledFuture<CommandTimeoutTask>) executor.schedule(timeoutTask,
-                    commandTimeout,
-                    TimeUnit.MILLISECONDS);
+            ScheduledFuture<CommandTimeoutTask> future = 
+            	(ScheduledFuture<CommandTimeoutTask>) executor.schedule(
+            			timeoutTask,
+            			commandTimeout,
+            			TimeUnit.MILLISECONDS);
 
             timeoutFutureMap.put(command, future);
         }
@@ -76,7 +78,6 @@ public class CommandTimeoutManager {
             }
 
             boolean wasCanceled = false;
-            CommandTimeoutTask task = null;
 
             synchronized (timeoutFutureMap) {
                 ScheduledFuture<CommandTimeoutTask> future =
@@ -84,10 +85,12 @@ public class CommandTimeoutManager {
                 wasCanceled = future.cancel(false);
             }
 
-            if (wasCanceled && log.isDebugEnabled()) {
-                StringBuilder sb = new StringBuilder("Timeout sucessful ");
-                sb.append("canceled for command ").append(command);
-                log.debug(sb.toString());
+            if (wasCanceled) {
+            	if (log.isDebugEnabled()) {
+            		StringBuilder sb = new StringBuilder("Timeout sucessful ");
+            		sb.append("canceled for command ").append(command);
+            		log.debug(sb.toString());
+            	}
                 
             } else {
                 StringBuilder sb = new StringBuilder("Timeout couldn't be ");
