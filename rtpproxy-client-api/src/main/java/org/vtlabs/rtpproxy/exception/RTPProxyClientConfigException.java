@@ -1,14 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package org.vtlabs.rtpproxy.config;
+package org.vtlabs.rtpproxy.exception;
 
 /**
  *
  * @author mhack
  */
-public class RTPProxyClientConfigException extends Exception {
+public class RTPProxyClientConfigException extends RTPProxyClientException {
 
     public RTPProxyClientConfigException(String message) {
         super(message);

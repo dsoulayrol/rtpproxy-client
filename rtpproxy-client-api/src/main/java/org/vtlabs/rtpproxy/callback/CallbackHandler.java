@@ -17,13 +17,13 @@ import org.vtlabs.rtpproxy.udp.DatagramListener;
  */
 public class CallbackHandler implements DatagramListener {
 
-    private TimeoutManager commandManager;
+    private TimeoutManager timeoutManager;
     private Logger log = LoggerFactory.getLogger(CallbackHandler.class);
     private static Pattern errorPattern = Pattern.compile("^E(.*)$");
     private Matcher errorMatcher;
 
     public CallbackHandler(TimeoutManager commandManager) {
-        this.commandManager = commandManager;
+        this.timeoutManager = commandManager;
         setupErrorMatcher();
     }
 
@@ -45,7 +45,7 @@ public class CallbackHandler implements DatagramListener {
             log.debug(sb.toString());
         }
 
-        Command command = commandManager.removeCommand(cookie);
+        Command command = timeoutManager.removeCommand(cookie);
 
         if (notError(message)) {
             command.processResponse(message);

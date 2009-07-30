@@ -2,7 +2,7 @@ package org.vtlabs.rtpproxy.command;
 
 import java.net.InetSocketAddress;
 import org.vtlabs.rtpproxy.client.RTPProxySession;
-import org.vtlabs.rtpproxy.client.RTPProxySessionException;
+import org.vtlabs.rtpproxy.exception.RTPProxyClientException;
 import org.vtlabs.rtpproxy.client.RTPProxySessionImpl;
 import org.vtlabs.rtpproxy.client.RTPProxySessionState;
 

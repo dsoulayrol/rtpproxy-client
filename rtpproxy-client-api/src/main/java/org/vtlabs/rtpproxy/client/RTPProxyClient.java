@@ -1,6 +1,7 @@
 package org.vtlabs.rtpproxy.client;
 
-import org.vtlabs.rtpproxy.config.RTPProxyClientConfigException;
+import org.vtlabs.rtpproxy.exception.RTPProxyClientTerminatedException;
+import org.vtlabs.rtpproxy.exception.RTPProxyClientConfigException;
 import org.vtlabs.rtpproxy.config.RTPProxyClientConfig;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -12,6 +13,7 @@ import org.vtlabs.rtpproxy.command.Command;
 import org.vtlabs.rtpproxy.command.CreateCommand;
 import org.vtlabs.rtpproxy.command.DestroyCommand;
 import org.vtlabs.rtpproxy.command.UpdateCommand;
+import org.vtlabs.rtpproxy.exception.RTPProxyClientException;
 import org.vtlabs.rtpproxy.scheduler.RTPProxyScheduler;
 import org.vtlabs.rtpproxy.scheduler.RTPProxySchedulerFactory;
 import org.vtlabs.rtpproxy.udp.DatagramListener;
@@ -30,7 +32,6 @@ public class RTPProxyClient {
      */
     private static final String DEFAULT_FROMTAG = "fromtag";
     private static final String DEFAULT_TOTAG = "totag";
-
     protected TimeoutManager commandTimeout;
     protected DatagramService udpService;
     protected CallbackHandler callbackHandler;
@@ -40,36 +41,20 @@ public class RTPProxyClient {
     protected boolean isTerminated;
 
     public RTPProxyClient(RTPProxyClientConfig config)
-            throws IOException, RTPProxyClientConfigException {
+            throws RTPProxyClientException {
         this.config = config;
-        executor = createThreadPoolExecutor(config.getPoolSize());
-        commandTimeout = createCommandTimeoutManager(executor, config.getCommandTimeout());
-        callbackHandler = createCallbackHandler(commandTimeout);
-        udpService = createDatagraService(config.getBindPort(), callbackHandler);
-        scheduler = createScheduler(config.getSchedulerName(), config.getServerList());
-    }
 
-    /**
-     * Terminate RTPProxyClient instance and release all resources. All
-     * subsequent call to client methods will throw an exception
-     * RTPProxyClientTerminatedException.
-     */
-    public void terminate() throws RTPProxyClientTerminatedException,
-            IOException {
-        synchronized (this) {
-            if (!isTerminated) {
-                udpService.stop();
-                commandTimeout.terminate();
-                executor.shutdownNow();
-            } else {
-                throw new RTPProxyClientTerminatedException(
-                        "RTPProxyClient instance is already terminated.");
-            }
+        try {
+            executor = createThreadPoolExecutor(config.getPoolSize());
+            commandTimeout = createCommandTimeoutManager(executor, config.getCommandTimeout());
+            callbackHandler = createCallbackHandler(commandTimeout);
+            udpService = createDatagraService(config.getBindPort(), callbackHandler);
+            scheduler = createScheduler(config.getSchedulerName(), config.getServerList());
+
+        } catch (Exception e) {
+            throw new RTPProxyClientException("Error starting RTPProxy-Client",
+                    e);
         }
-    }
-
-    public boolean isTerminated() {
-        return isTerminated;
     }
 
     /**
@@ -89,7 +74,7 @@ public class RTPProxyClient {
      *        callback methods).
      */
     public void createSession(String sessionID, Object appData,
-            RTPProxyClientListener listener) throws NoServerAvailableException {
+            RTPProxyClientListener listener) throws RTPProxyClientException {
 
         createSession(sessionID, null, appData, listener);
     }
@@ -113,9 +98,7 @@ public class RTPProxyClient {
      */
     public void createSession(String sessionID, InetSocketAddress callerAddress,
             Object appData, RTPProxyClientListener listener)
-            throws NoServerAvailableException {
-
-        checkState();
+            throws RTPProxyClientException {
 
         CreateCommand createCommand = new CreateCommand();
         createCommand.setSessionID(sessionID);
@@ -142,8 +125,8 @@ public class RTPProxyClient {
      *        callback methods).
      */
     public void updateSession(RTPProxySession session, Object appData,
-            RTPProxyClientListener listener) throws NoServerAvailableException {
-        
+            RTPProxyClientListener listener) throws RTPProxyClientException {
+
         updateSession(session, null, appData, listener);
     }
 
@@ -164,23 +147,18 @@ public class RTPProxyClient {
     public void updateSession(RTPProxySession session,
             InetSocketAddress calleeAddress,
             Object appData, RTPProxyClientListener listener)
-            throws NoServerAvailableException {
-
-        checkState();
+            throws RTPProxyClientException {
 
         UpdateCommand updateCmd = new UpdateCommand(session);
         updateCmd.setListener(listener);
         updateCmd.setServer(session.getServer());
         updateCmd.setAppData(appData);
+        updateCmd.setPrefillingAddress(calleeAddress);
 
-        // Invert from/to is necessary to let RTPProxy server know we want to
-        // get the Caller media address with this command.
+        // It's necessary to invert from/to tag to let RTPProxy server know we
+        // want to get the Caller media address with this command.
         updateCmd.setFromTag(DEFAULT_TOTAG);
         updateCmd.setToTag(DEFAULT_FROMTAG);
-
-        if (calleeAddress != null) {
-            updateCmd.setPrefillingAddress(calleeAddress);
-        }
 
         sendCommand(updateCmd, session.getServer().getAddress());
     }
@@ -197,9 +175,7 @@ public class RTPProxyClient {
      *        callback methods).
      */
     public void destroySession(RTPProxySession sessionIface, Object appData,
-            RTPProxyClientListener listener) throws NoServerAvailableException {
-
-        checkState();
+            RTPProxyClientListener listener) throws RTPProxyClientException {
 
         RTPProxySessionImpl session = (RTPProxySessionImpl) sessionIface;
         DestroyCommand destroyCmd = new DestroyCommand(session);
@@ -215,13 +191,21 @@ public class RTPProxyClient {
      * Add the command to the {@link CommandTimeoutManager} and send it to the
      * given server address using the {@link DatagramService}.
      */
-    protected void sendCommand(Command command, InetSocketAddress serverAddr) {
-        commandTimeout.addCommand(command);
-        udpService.send(command.getMessage(), serverAddr);
+    protected void sendCommand(Command command, InetSocketAddress serverAddr)
+            throws RTPProxyClientTerminatedException {
+
+        if (!isTerminated) {
+            commandTimeout.addCommand(command);
+            udpService.send(command.getMessage(), serverAddr);
+
+        } else {
+            throw new RTPProxyClientTerminatedException(
+                    "RTPProxyClient instance is already terminated.");
+        }
     }
 
     /**
-     * Get RTPProxyClient configuration.
+     * Get RTPProxy-Client service configuration.
      *
      * @return Client configuration.
      */
@@ -230,16 +214,30 @@ public class RTPProxyClient {
     }
 
     /**
-     * Check if the RTPProxyClient instance is able to provide the service.
-     * Basically it checks if the instance was terminated.
-     *
-     * @throws RTPProxyClientTerminatedException.
+     * Terminate RTPProxyClient instance and release all resources. All
+     * subsequent call to client methods will throw an exception
+     * RTPProxyClientTerminatedException.
      */
-    protected void checkState() {
-        if (isTerminated) {
-            throw new RTPProxyClientTerminatedException(
-                    "RTPProxyClient instance is already terminated.");
+    public void terminate() throws RTPProxyClientException {
+        try {
+            synchronized (this) {
+                if (!isTerminated) {
+                    udpService.stop();
+                    commandTimeout.terminate();
+                    executor.shutdownNow();
+                } else {
+                    throw new RTPProxyClientTerminatedException(
+                            "RTPProxyClient instance is already terminated.");
+                }
+            }
+        } catch (Exception e) {
+            throw new RTPProxyClientException(
+                    "Error terminating RTPProxy-Client", e);
         }
+    }
+
+    public boolean isTerminated() {
+        return isTerminated;
     }
 
     /**

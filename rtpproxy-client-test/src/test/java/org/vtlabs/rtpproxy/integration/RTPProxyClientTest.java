@@ -9,13 +9,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vtlabs.rtpproxy.client.NoServerAvailableException;
 import org.vtlabs.rtpproxy.client.RTPProxyClient;
 import org.vtlabs.rtpproxy.client.RTPProxySessionState;
 import org.vtlabs.rtpproxy.config.RTPProxyClientConfig;
 import org.vtlabs.rtpproxy.config.RTPProxyClientConfigurator;
 import org.vtlabs.rtpproxy.client.RTPProxyClientListener;
 import org.vtlabs.rtpproxy.client.RTPProxySession;
+import org.vtlabs.rtpproxy.exception.RTPProxyClientException;
 import static org.junit.Assert.*;
 
 /**
@@ -126,8 +126,8 @@ public class RTPProxyClientTest implements RTPProxyClientListener {
             log.info("Updating session " + session);
             client.updateSession(session, appData, this);
 
-        } catch (NoServerAvailableException noServerEx) {
-            log.error("No server available on updating session.", noServerEx);
+        } catch (RTPProxyClientException e) {
+            log.error("Error trying to update session.", e);
         }
     }
 

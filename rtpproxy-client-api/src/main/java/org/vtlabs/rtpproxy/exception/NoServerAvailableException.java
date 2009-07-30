@@ -3,13 +3,13 @@
  * and open the template in the editor.
  */
 
-package org.vtlabs.rtpproxy.client;
+package org.vtlabs.rtpproxy.exception;
 
 /**
  *
  * @author mhack
  */
-public class NoServerAvailableException extends Exception {
+public class NoServerAvailableException extends RTPProxyClientException {
     public NoServerAvailableException(String message) {
         super(message);
     }

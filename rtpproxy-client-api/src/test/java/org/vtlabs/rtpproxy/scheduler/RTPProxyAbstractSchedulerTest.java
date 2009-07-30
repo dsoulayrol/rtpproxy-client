@@ -8,7 +8,7 @@ package org.vtlabs.rtpproxy.scheduler;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
-import org.vtlabs.rtpproxy.client.NoServerAvailableException;
+import org.vtlabs.rtpproxy.exception.NoServerAvailableException;
 import static org.junit.Assert.*;
 import org.vtlabs.rtpproxy.client.RTPProxyServer;
 

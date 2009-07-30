@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vtlabs.rtpproxy.callback.CallbackHandler;
 import org.vtlabs.rtpproxy.client.RTPProxyClientListener;
-import org.vtlabs.rtpproxy.client.RTPProxySessionException;
+import org.vtlabs.rtpproxy.exception.RTPProxyClientException;
 
 /**
  * {@link Command} implementations are used to build command lines to be sent to
@@ -124,11 +124,11 @@ public abstract class Command {
         this.toTag = toTag;
     }
 
-    protected RTPProxySessionException createException(String message,
+    protected RTPProxyClientException createException(String message,
             String errorMessage) {
         StringBuilder sb = new StringBuilder(message).append(": ");
         sb.append(errorMessage);
-        return new RTPProxySessionException(sb.toString());
+        return new RTPProxyClientException(sb.toString());
     }
 
     @Override

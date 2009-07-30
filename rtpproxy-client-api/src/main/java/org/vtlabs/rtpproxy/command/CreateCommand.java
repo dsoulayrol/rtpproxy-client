@@ -4,7 +4,7 @@ import java.net.InetSocketAddress;
 import org.apache.commons.lang.StringUtils;
 import org.vtlabs.rtpproxy.client.RTPProxyClient;
 import org.vtlabs.rtpproxy.client.RTPProxyServer;
-import org.vtlabs.rtpproxy.client.RTPProxySessionException;
+import org.vtlabs.rtpproxy.exception.RTPProxyClientException;
 import org.vtlabs.rtpproxy.client.RTPProxySessionImpl;
 import org.vtlabs.rtpproxy.client.RTPProxySessionState;
 

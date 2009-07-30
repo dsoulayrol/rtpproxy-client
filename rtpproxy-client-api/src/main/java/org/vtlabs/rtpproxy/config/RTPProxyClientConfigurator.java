@@ -4,6 +4,7 @@
  */
 package org.vtlabs.rtpproxy.config;
 
+import org.vtlabs.rtpproxy.exception.RTPProxyClientConfigException;
 import org.vtlabs.rtpproxy.client.*;
 import java.io.File;
 import java.io.FileInputStream;

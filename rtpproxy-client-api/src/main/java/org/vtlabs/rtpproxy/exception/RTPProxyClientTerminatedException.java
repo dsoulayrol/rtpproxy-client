@@ -3,13 +3,13 @@
  * and open the template in the editor.
  */
 
-package org.vtlabs.rtpproxy.client;
+package org.vtlabs.rtpproxy.exception;
 
 /**
  *
  * @author mhack
  */
-class RTPProxyClientTerminatedException extends RuntimeException {
+public class RTPProxyClientTerminatedException extends RTPProxyClientException {
 
     public RTPProxyClientTerminatedException(String message) {
         super(message);

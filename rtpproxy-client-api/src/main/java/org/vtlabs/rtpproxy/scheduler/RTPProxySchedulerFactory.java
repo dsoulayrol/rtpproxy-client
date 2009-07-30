@@ -1,7 +1,7 @@
 package org.vtlabs.rtpproxy.scheduler;
 
 import java.util.List;
-import org.vtlabs.rtpproxy.config.RTPProxyClientConfigException;
+import org.vtlabs.rtpproxy.exception.RTPProxyClientConfigException;
 import org.vtlabs.rtpproxy.client.RTPProxyServer;
 
 /**

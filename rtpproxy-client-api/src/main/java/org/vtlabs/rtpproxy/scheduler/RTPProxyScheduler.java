@@ -1,7 +1,7 @@
 package org.vtlabs.rtpproxy.scheduler;
 
 import java.util.List;
-import org.vtlabs.rtpproxy.client.NoServerAvailableException;
+import org.vtlabs.rtpproxy.exception.NoServerAvailableException;
 import org.vtlabs.rtpproxy.client.RTPProxyServer;
 
 /**

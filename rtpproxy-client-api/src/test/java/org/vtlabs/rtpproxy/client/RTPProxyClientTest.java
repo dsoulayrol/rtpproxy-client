@@ -11,12 +11,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vtlabs.rtpproxy.command.Command;
 import org.vtlabs.rtpproxy.config.RTPProxyClientConfig;
-import org.vtlabs.rtpproxy.config.RTPProxyClientConfigException;
+import org.vtlabs.rtpproxy.exception.RTPProxyClientConfigException;
 import org.vtlabs.rtpproxy.config.RTPProxyClientConfigurator;
 import org.vtlabs.rtpproxy.timeout.TimeoutManager;
 import org.vtlabs.rtpproxy.command.CreateCommand;
 import org.vtlabs.rtpproxy.command.DestroyCommand;
 import org.vtlabs.rtpproxy.command.UpdateCommand;
+import org.vtlabs.rtpproxy.exception.RTPProxyClientException;
 import org.vtlabs.rtpproxy.mock.client.RTPProxyClientListenerMOCK;
 import org.vtlabs.rtpproxy.mock.command.CommandTimeoutManagerMOCK;
 import org.vtlabs.rtpproxy.mock.udp.DatagramServiceMOCK;
@@ -114,7 +115,7 @@ public class RTPProxyClientTest {
     protected class RTPProxyClientMOCK extends RTPProxyClient {
 
         public RTPProxyClientMOCK(RTPProxyClientConfig config)
-                throws IOException, RTPProxyClientConfigException {
+                throws RTPProxyClientException {
             super(config);
         }
 

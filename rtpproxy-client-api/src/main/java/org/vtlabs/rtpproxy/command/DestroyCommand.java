@@ -1,6 +1,6 @@
 package org.vtlabs.rtpproxy.command;
 
-import org.vtlabs.rtpproxy.client.RTPProxySessionException;
+import org.vtlabs.rtpproxy.exception.RTPProxyClientException;
 import org.vtlabs.rtpproxy.client.RTPProxySessionImpl;
 import org.vtlabs.rtpproxy.client.RTPProxySessionState;
 
