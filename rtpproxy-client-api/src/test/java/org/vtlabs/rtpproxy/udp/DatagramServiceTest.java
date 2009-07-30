@@ -9,6 +9,7 @@ import java.net.InetSocketAddress;
 import org.apache.mina.common.IoSession;
 import org.junit.Test;
 import org.vtlabs.rtpproxy.BaseTest;
+import org.vtlabs.rtpproxy.message.ResponseMessage;
 import static org.junit.Assert.*;
 
 /**
@@ -45,8 +46,7 @@ public class DatagramServiceTest extends BaseTest {
 
     protected class DatagramListenerMOCK implements DatagramListener {
 
-        public void processResponse(String cookie, String message,
-                InetSocketAddress srcAddr) {
+        public void processResponse(ResponseMessage message) {
         }
     }
 }

@@ -14,6 +14,7 @@ import org.vtlabs.rtpproxy.command.DestroyCommand;
 import org.vtlabs.rtpproxy.command.UpdateCommand;
 import org.vtlabs.rtpproxy.BaseTest;
 import org.vtlabs.rtpproxy.command.CreateCommand;
+import org.vtlabs.rtpproxy.message.ResponseMessage;
 import org.vtlabs.rtpproxy.mock.client.RTPProxyClientListenerMOCK;
 import org.vtlabs.rtpproxy.mock.command.CommandTimeoutManagerMOCK;
 import static org.junit.Assert.*;
@@ -58,11 +59,13 @@ public class CallbackHandlerTest extends BaseTest {
         // address
         int sessionPort = 30000;
         String sessionIP = "127.0.0.1";
-        String message = sessionPort + " " + sessionIP;
+        String messageLine = sessionPort + " " + sessionIP;
+        ResponseMessage message = new ResponseMessage(cmdCookie, messageLine,
+                srvAddr);
 
 
         // Burn it!
-        callbackHandler.processResponse(cmdCookie, message, srvAddr);
+        callbackHandler.processResponse(message);
 
         // Check
         assertTrue("Listener didn't receive a 'create' event",
@@ -131,10 +134,12 @@ public class CallbackHandlerTest extends BaseTest {
         timeoutMngr.addCommand(createCommand);
 
         // Fake RTPProxy error message in the format /^E(.*)$/
-        String message = "E3";
+        String messageLine = "E3";
+        ResponseMessage message = new ResponseMessage(cmdCookie, messageLine,
+                srvAddr);
 
         // Burn it!
-        callbackHandler.processResponse(cmdCookie, message, srvAddr);
+        callbackHandler.processResponse(message);
 
         // Check
         assertTrue("Listener didn't received a 'create failed' event",
@@ -205,10 +210,12 @@ public class CallbackHandlerTest extends BaseTest {
         // address
         int sessionPort = 30002;
         String sessionIP = "127.0.0.1";
-        String message = sessionPort + " " + sessionIP;
+        String messageLine = sessionPort + " " + sessionIP;
+        ResponseMessage message = new ResponseMessage(cmdCookie, messageLine, 
+                srvAddr);
 
         // Burn it!
-        callbackHandler.processResponse(cmdCookie, message, srvAddr);
+        callbackHandler.processResponse(message);
 
         // Check
         assertTrue("Listener didn't receive an 'update' event",
@@ -287,10 +294,12 @@ public class CallbackHandlerTest extends BaseTest {
         timeoutMngr.addCommand(updateCommand);
 
         // Fake RTPProxy error response for the update command
-        String message = "E3";
+        String messageLine = "E3";
+        ResponseMessage message = new ResponseMessage(cmdCookie, messageLine,
+                srvAddr);
 
         // Burn it!
-        callbackHandler.processResponse(cmdCookie, message, srvAddr);
+        callbackHandler.processResponse(message);
 
         // Check
         assertTrue("Listener didn't received an 'update failed' event",
@@ -365,10 +374,12 @@ public class CallbackHandlerTest extends BaseTest {
 
         // Create a fake RTPProxy response message with the session port and IP
         // address
-        String responseMessage = "0";
+        String messageLine = "0";
+        ResponseMessage message = new ResponseMessage(cmdCookie, messageLine,
+                srvAddr);
 
         // Burn it!
-        callbackHandler.processResponse(cmdCookie, responseMessage, srvAddr);
+        callbackHandler.processResponse(message);
 
         // Check
         assertTrue("Listener didn't receive an 'destroy' event",

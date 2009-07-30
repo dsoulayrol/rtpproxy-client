@@ -5,12 +5,12 @@
 
 package org.vtlabs.rtpproxy.udp;
 
-import java.net.InetSocketAddress;
+import org.vtlabs.rtpproxy.message.ResponseMessage;
 
 /**
  *
  * @author mhack
  */
 public interface DatagramListener {
-    public void processResponse(String cookie, String message, InetSocketAddress srcAddr);
+    public void processResponse(ResponseMessage message);
 }

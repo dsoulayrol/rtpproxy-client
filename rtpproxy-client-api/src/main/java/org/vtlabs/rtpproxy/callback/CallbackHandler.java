@@ -1,11 +1,9 @@
 package org.vtlabs.rtpproxy.callback;
 
-import java.net.InetSocketAddress;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vtlabs.rtpproxy.command.Command;
+import org.vtlabs.rtpproxy.message.ResponseMessage;
 import org.vtlabs.rtpproxy.timeout.TimeoutManager;
 import org.vtlabs.rtpproxy.udp.DatagramListener;
 
@@ -19,47 +17,31 @@ public class CallbackHandler implements DatagramListener {
 
     private TimeoutManager timeoutManager;
     private Logger log = LoggerFactory.getLogger(CallbackHandler.class);
-    private static Pattern errorPattern = Pattern.compile("^E(.*)$");
-    private Matcher errorMatcher;
 
     public CallbackHandler(TimeoutManager commandManager) {
         this.timeoutManager = commandManager;
-        setupErrorMatcher();
     }
 
     /**
      * Callback method for received datagram messages (DatagramListener).
      *
-     * @param Command cookie
-     * @param Response message
-     * @param Datagram source address
+     * @param ResponseMessage
      */
-    public void processResponse(String cookie, String message,
-            InetSocketAddress srcAddr) {
+    public void processResponse(ResponseMessage message) {
 
         if (log.isDebugEnabled()) {
             StringBuilder sb = new StringBuilder("Processing reponse message ");
-            sb.append("\'").append(cookie);
-            sb.append(" ").append(message).append("\'");
-            sb.append(" received from ").append(srcAddr);
+            sb.append(message);
             log.debug(sb.toString());
         }
 
-        Command command = timeoutManager.removeCommand(cookie);
+        Command command = timeoutManager.removeCommand(message.getCookie());
 
-        if (notError(message)) {
-            command.processResponse(message);
+        if (!message.isError()) {
+            command.processResponse(message.getMessageLine());
             
         } else {
-            command.processError(message);
+            command.processError(message.getMessageLine());
         }
-    }
-
-    public boolean notError(String message) {
-        return !errorMatcher.reset(message).matches();
-    }
-
-    private void setupErrorMatcher() {
-        errorMatcher = errorPattern.matcher("");
     }
 }

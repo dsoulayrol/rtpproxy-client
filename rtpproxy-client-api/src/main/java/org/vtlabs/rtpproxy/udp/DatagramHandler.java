@@ -5,11 +5,11 @@
 package org.vtlabs.rtpproxy.udp;
 
 import java.net.InetSocketAddress;
-import org.apache.commons.lang.StringUtils;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vtlabs.rtpproxy.message.ResponseMessage;
 
 /**
  *
@@ -28,20 +28,21 @@ public class DatagramHandler extends IoHandlerAdapter {
     public void messageReceived(IoSession session, Object objectMessage)
             throws Exception {
 
-        String responseLine = objectMessage.toString();
-        String arrCookieMessage[] = StringUtils.split(responseLine, " ", 2);
-        String cookie = arrCookieMessage[0];
-        String message = arrCookieMessage[1];
-        InetSocketAddress srcAddr = (InetSocketAddress) session.getRemoteAddress();
+        try {
+            ResponseMessage message = ResponseMessage.parseMessage(
+                    objectMessage.toString(),
+                    (InetSocketAddress) session.getRemoteAddress());
 
-        if (log.isDebugEnabled()) {
-            StringBuilder sb = new StringBuilder("Message received from ");
-            sb.append(srcAddr);
-            sb.append(": cookie = \'").append(cookie).append("\'");
-            sb.append(", message = \'").append(message).append("\'");
-            log.debug(sb.toString());
+            if (log.isDebugEnabled()) {
+                StringBuilder sb = new StringBuilder("Message received ");
+                sb.append(message);
+                log.debug(sb.toString());
+            }
+
+            listener.processResponse(message);
+
+        } catch (Exception e) {
+            log.error("Error processing response message", e);
         }
-
-        listener.processResponse(cookie, message, srcAddr);
     }
 }

@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import org.junit.Test;
 import org.vtlabs.rtpproxy.BaseTest;
+import org.vtlabs.rtpproxy.message.ResponseMessage;
 import static org.junit.Assert.*;
 
 /**
@@ -24,21 +25,16 @@ public class DatagramHandlerTest extends BaseTest {
         DatagramHandler handler = new DatagramHandler(listener);
         handler.messageReceived(session, messageLine);
 
-        assertEquals("Invalid cookie", cookie, listener.cookie);
-        assertEquals("Invalid message", message, listener.message);
-        assertEquals("Invalid source address", srcAddr, listener.srcAddr);
+        assertEquals("Invalid cookie", cookie, listener.message.getCookie());
+        assertEquals("Invalid message", message, listener.message.getMessageLine());
+        assertEquals("Invalid source address", srcAddr, listener.message.getSrcAddr());
     }
 
     protected class DatagramListenerMOCK implements DatagramListener {
-        public String cookie;
-        public String message;
-        public InetSocketAddress srcAddr;
+        public ResponseMessage message;
 
-        public void processResponse(String cookie, String message,
-                InetSocketAddress srcAddr) {
-            this.cookie = cookie;
+        public void processResponse(ResponseMessage message) {
             this.message = message;
-            this.srcAddr = srcAddr;
         }
     }
 
