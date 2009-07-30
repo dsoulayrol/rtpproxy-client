@@ -15,9 +15,12 @@ import org.vtlabs.rtpproxy.client.RTPProxySessionImpl;
 public class RTPProxyClientListenerMOCK
         implements RTPProxyClientListener {
 
-    public boolean isTimeout;
-    public String timeoutSessionID;
-    public Object timeoutAppData;
+    public boolean isCreateTimeout;
+    public String createTimeoutSessionID;
+    public Object createTimeoutAppData;
+    public boolean isUpdateTimeout;
+    public RTPProxySessionImpl updateTimeoutSession;
+    public Object updateTimeoutAppData;
     public boolean isCreateFail;
     public String createFailedSessionID;
     public Object createFailedAppData;
@@ -41,9 +44,9 @@ public class RTPProxyClientListenerMOCK
     public Object destroyAppData;
 
     public void createSessionTimeout(String sessionID, Object appData) {
-        isTimeout = true;
-        timeoutSessionID = sessionID;
-        timeoutAppData = appData;
+        isCreateTimeout = true;
+        createTimeoutSessionID = sessionID;
+        createTimeoutAppData = appData;
     }
 
     public void createSessionFailed(String sessionID, Object appData,
@@ -63,7 +66,9 @@ public class RTPProxyClientListenerMOCK
     }
 
     public void updateSessionTimeout(RTPProxySession session, Object appData) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        isUpdateTimeout = true;
+        updateTimeoutSession = (RTPProxySessionImpl) session;
+        updateTimeoutAppData = appData;
     }
 
     public void sessionCreated(RTPProxySession session, Object appData) {

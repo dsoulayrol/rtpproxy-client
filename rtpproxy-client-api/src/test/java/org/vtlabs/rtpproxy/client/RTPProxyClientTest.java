@@ -14,6 +14,7 @@ import org.vtlabs.rtpproxy.config.RTPProxyClientConfig;
 import org.vtlabs.rtpproxy.config.RTPProxyClientConfigException;
 import org.vtlabs.rtpproxy.config.RTPProxyClientConfigurator;
 import org.vtlabs.rtpproxy.command.CommandTimeoutManager;
+import org.vtlabs.rtpproxy.command.CreateCommand;
 import org.vtlabs.rtpproxy.command.DestroyCommand;
 import org.vtlabs.rtpproxy.command.UpdateCommand;
 import org.vtlabs.rtpproxy.mock.client.RTPProxyClientListenerMOCK;
@@ -48,7 +49,7 @@ public class RTPProxyClientTest {
         client.createSession(sessionID, appData, listener);
 
         // TODO [marcoshack] assert command attributes
-        UpdateCommand command = (UpdateCommand)assertCommons(appData);
+        CreateCommand command = (CreateCommand)assertCommons(appData);
     }
 
     @Test
@@ -100,7 +101,7 @@ public class RTPProxyClientTest {
         assertNotNull("Invalid sent message", udpService.sentMessage);
 
         assertEquals("Invalid callback listener", listener,
-                command.getCallbackListener());
+                command.getListener());
 
         assertEquals("Invalid AppData", appData, command.getAppData());
         

@@ -3,6 +3,7 @@ package org.vtlabs.rtpproxy.command;
 import java.net.InetSocketAddress;
 import org.junit.Test;
 import org.vtlabs.rtpproxy.BaseTest;
+import org.vtlabs.rtpproxy.client.RTPProxySessionImpl;
 import static org.junit.Assert.*;
 
 /**
@@ -10,6 +11,8 @@ import static org.junit.Assert.*;
  * @author mhack
  */
 public class UpdateCommandTest extends BaseTest {
+
+    private final RTPProxySessionImpl session = new RTPProxySessionImpl();
 
     /**
      * Test the creation of command message with all fields set.
@@ -21,11 +24,11 @@ public class UpdateCommandTest extends BaseTest {
         String toTag = "to_tag";
         InetSocketAddress address = new InetSocketAddress("127.0.0.1", 4100);
 
-        UpdateCommand updateCmd = new UpdateCommand(null);
-        updateCmd.setSessionID(sessionID);
+        session.setSessionID(sessionID);
+        UpdateCommand updateCmd = new UpdateCommand(session);
         updateCmd.setFromTag(fromTag);
         updateCmd.setToTag(toTag);
-        updateCmd.setAddress(address);
+        updateCmd.setPrefillingAddress(address);
 
         // expected message
         StringBuilder message = new StringBuilder(updateCmd.getCookie());
@@ -51,8 +54,8 @@ public class UpdateCommandTest extends BaseTest {
         String fromTag = "from_tag";
         String toTag = "to_tag";
 
-        UpdateCommand updateCmd = new UpdateCommand(null);
-        updateCmd.setSessionID(sessionID);
+        session.setSessionID(sessionID);
+        UpdateCommand updateCmd = new UpdateCommand(session);
         updateCmd.setFromTag(fromTag);
         updateCmd.setToTag(toTag);
 

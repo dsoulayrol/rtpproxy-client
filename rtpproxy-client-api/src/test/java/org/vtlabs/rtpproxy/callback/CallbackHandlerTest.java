@@ -5,9 +5,7 @@
 package org.vtlabs.rtpproxy.callback;
 
 import java.net.InetSocketAddress;
-import org.junit.Before;
 import org.junit.Test;
-import org.vtlabs.rtpproxy.callback.CallbackHandler;
 import org.vtlabs.rtpproxy.client.RTPProxyServer;
 import org.vtlabs.rtpproxy.client.RTPProxySession;
 import org.vtlabs.rtpproxy.client.RTPProxySessionImpl;
@@ -15,6 +13,7 @@ import org.vtlabs.rtpproxy.client.RTPProxySessionState;
 import org.vtlabs.rtpproxy.command.DestroyCommand;
 import org.vtlabs.rtpproxy.command.UpdateCommand;
 import org.vtlabs.rtpproxy.BaseTest;
+import org.vtlabs.rtpproxy.command.CreateCommand;
 import org.vtlabs.rtpproxy.mock.client.RTPProxyClientListenerMOCK;
 import org.vtlabs.rtpproxy.mock.command.CommandTimeoutManagerMOCK;
 import static org.junit.Assert.*;
@@ -25,16 +24,10 @@ import static org.junit.Assert.*;
  */
 public class CallbackHandlerTest extends BaseTest {
 
-    private CommandTimeoutManagerMOCK timeoutMngr;
-    private CallbackHandler callbackHandler;
-    private RTPProxyClientListenerMOCK listener;
-
-    @Before
-    public void setUp() {
-        timeoutMngr = new CommandTimeoutManagerMOCK(null, 0);
-        callbackHandler = new CallbackHandler(timeoutMngr);
-        listener = new RTPProxyClientListenerMOCK();
-    }
+    private final CommandTimeoutManagerMOCK timeoutMngr = new CommandTimeoutManagerMOCK(null, 0);
+    private final CallbackHandler callbackHandler = new CallbackHandler(timeoutMngr);
+    private final RTPProxyClientListenerMOCK listener = new RTPProxyClientListenerMOCK();
+    private final RTPProxySessionImpl session = new RTPProxySessionImpl();
 
     @Test
     public void processSessionCreated() {
@@ -49,17 +42,17 @@ public class CallbackHandlerTest extends BaseTest {
 
         // Create a update command to be recovered by the callback handler via
         // the command timeout manager
-        UpdateCommand updateCommand = new UpdateCommand(callbackHandler);
-        updateCommand.setCallbackListener(listener);
-        updateCommand.setAppData(appData);
-        updateCommand.setSessionID(sessionID);
-        updateCommand.setCookie(cmdCookie);
-        updateCommand.setFromTag(fromTag);
-        updateCommand.setToTag(toTag);
-        updateCommand.setServer(server);
+        CreateCommand createCommand = new CreateCommand();
+        createCommand.setListener(listener);
+        createCommand.setAppData(appData);
+        createCommand.setSessionID(sessionID);
+        createCommand.setCookie(cmdCookie);
+        createCommand.setFromTag(fromTag);
+        createCommand.setToTag(toTag);
+        createCommand.setServer(server);
 
         // Finally add the command to the timeout manager
-        timeoutMngr.addPendingCommand(updateCommand);
+        timeoutMngr.addPendingCommand(createCommand);
 
         // Create a fake RTPProxy response message with the session port and IP
         // address
@@ -85,35 +78,36 @@ public class CallbackHandlerTest extends BaseTest {
                 listener.isUpdateFail);
 
         assertFalse("Listener received an invalid 'timeout' event",
-                listener.isTimeout);
+                listener.isCreateTimeout);
 
-        RTPProxySession session = listener.createdSession;
-        assertNotNull("RTP session wasn't created", listener.createdSession);
+        RTPProxySession createSession = listener.createdSession;
+        assertNotNull("RTP session wasn't created", createSession);
 
-        assertNotNull("Session server wasn't associated", session.getServer());
+        assertNotNull("Session server wasn't associated", createSession.getServer());
 
-        assertEquals("Invalid session server", server, session.getServer());
+        assertEquals("Invalid session server", server, createSession.getServer());
 
         assertNotNull("Callee media address wasn't created",
-                session.getCalleeMediaAddress());
+                createSession.getCalleeMediaAddress());
 
         assertEquals("Invalid callee media IP address",
                 sessionIP,
-                session.getCalleeMediaAddress().getAddress().getHostAddress());
+                createSession.getCalleeMediaAddress().getAddress().getHostAddress());
 
         assertEquals("Invalid callee media port",
-                sessionPort, session.getCalleeMediaAddress().getPort());
+                sessionPort, createSession.getCalleeMediaAddress().getPort());
 
         assertEquals("Invalid AppData for 'create' event", appData,
                 listener.createdAppData);
         
         assertEquals("Invalid session state", RTPProxySessionState.CREATED,
-        		session.getState());
+        		createSession.getState());
     }
 
     @Test
     public void processCreateSessionFailed() {
         String sessionID = "create_error_sessionid";
+        session.setSessionID(sessionID);
         Long appData = 12345L; // A long object to be used as AppData.
         String cmdCookie = "create_error_cookie";
         String fromTag = "create_error_fromtag";
@@ -124,17 +118,17 @@ public class CallbackHandlerTest extends BaseTest {
 
         // Create a update command to be recovered by the callback handler via
         // the command timeout manager
-        UpdateCommand updateCommand = new UpdateCommand(callbackHandler);
-        updateCommand.setCallbackListener(listener);
-        updateCommand.setAppData(appData);
-        updateCommand.setSessionID(sessionID);
-        updateCommand.setCookie(cmdCookie);
-        updateCommand.setFromTag(fromTag);
-        updateCommand.setToTag(toTag);
-        updateCommand.setServer(server);
+        CreateCommand createCommand = new CreateCommand();
+        createCommand.setListener(listener);
+        createCommand.setAppData(appData);
+        createCommand.setSessionID(sessionID);
+        createCommand.setCookie(cmdCookie);
+        createCommand.setFromTag(fromTag);
+        createCommand.setToTag(toTag);
+        createCommand.setServer(server);
 
         // Finally add the command to the timeout manager
-        timeoutMngr.addPendingCommand(updateCommand);
+        timeoutMngr.addPendingCommand(createCommand);
 
         // Fake RTPProxy error message in the format /^E(.*)$/
         String message = "E3";
@@ -156,7 +150,7 @@ public class CallbackHandlerTest extends BaseTest {
                 listener.isCreate);
 
         assertFalse("Listener received an invalid 'timeout' event",
-                listener.isTimeout);
+                listener.isCreateTimeout);
 
         assertEquals("Invalid session ID", sessionID,
                 listener.createFailedSessionID);
@@ -186,7 +180,6 @@ public class CallbackHandlerTest extends BaseTest {
 
         // Update command has an RTPProxy session with a not null callee media
         // address
-        RTPProxySessionImpl session = new RTPProxySessionImpl();
         session.setSessionID(sessionID);
         session.setServer(server);
         session.setState(RTPProxySessionState.CREATED);
@@ -196,8 +189,8 @@ public class CallbackHandlerTest extends BaseTest {
 
         // Create a update command to be recovered by the callback handler via
         // the command timeout manager
-        UpdateCommand updateCommand = new UpdateCommand(session, callbackHandler);
-        updateCommand.setCallbackListener(listener);
+        UpdateCommand updateCommand = new UpdateCommand(session);
+        updateCommand.setListener(listener);
         updateCommand.setAppData(appData);
         updateCommand.setSessionID(sessionID);
         updateCommand.setCookie(cmdCookie);
@@ -231,7 +224,7 @@ public class CallbackHandlerTest extends BaseTest {
                 listener.isCreateFail);
 
         assertFalse("Listener received an invalid 'timeout' event",
-                listener.isTimeout);
+                listener.isCreateTimeout);
 
         RTPProxySession updatedSession = listener.updatedSession;
         assertNotNull("RTP session wasn't updated", updatedSession);
@@ -272,7 +265,6 @@ public class CallbackHandlerTest extends BaseTest {
 
         // Update command has an RTPProxy session with a not null callee media
         // address
-        RTPProxySessionImpl session = new RTPProxySessionImpl();
         session.setSessionID(sessionID);
         session.setServer(server);
         session.setState(RTPProxySessionState.CREATED);
@@ -282,8 +274,8 @@ public class CallbackHandlerTest extends BaseTest {
 
         // Create a update command to be recovered by the callback handler via
         // the command timeout manager
-        UpdateCommand updateCommand = new UpdateCommand(session, callbackHandler);
-        updateCommand.setCallbackListener(listener);
+        UpdateCommand updateCommand = new UpdateCommand(session);
+        updateCommand.setListener(listener);
         updateCommand.setAppData(appData);
         updateCommand.setSessionID(sessionID);
         updateCommand.setCookie(cmdCookie);
@@ -314,7 +306,7 @@ public class CallbackHandlerTest extends BaseTest {
                 listener.isCreateFail);
 
         assertFalse("Listener received an invalid 'timeout' event",
-                listener.isTimeout);
+                listener.isCreateTimeout);
 
         assertEquals("Invalid session passed to update failed callback method",
                 session, listener.updateFailedSession);
@@ -347,7 +339,6 @@ public class CallbackHandlerTest extends BaseTest {
 
         // Destroy command has an RTPProxy session with callee and caller media 
         // address set and state CREATED.
-        RTPProxySessionImpl session = new RTPProxySessionImpl();
         session.setSessionID(sessionID);
         session.setServer(server);
         session.setState(RTPProxySessionState.CREATED);
@@ -361,8 +352,8 @@ public class CallbackHandlerTest extends BaseTest {
 
         // Create a destroy command to be recovered by the callback handler via
         // the command timeout manager
-        DestroyCommand destroyCommand = new DestroyCommand(session, callbackHandler);
-        destroyCommand.setCallbackListener(listener);
+        DestroyCommand destroyCommand = new DestroyCommand(session);
+        destroyCommand.setListener(listener);
         destroyCommand.setAppData(appData);
         destroyCommand.setSessionID(sessionID);
         destroyCommand.setCookie(cmdCookie);
@@ -402,18 +393,21 @@ public class CallbackHandlerTest extends BaseTest {
     @Test
     public void processCommandTimeout() {
         String sessionID = "command_timeout_sessionid";
+        session.setSessionID(sessionID);
         Object appData = new Object();
 
-        UpdateCommand command = new UpdateCommand(callbackHandler);
+        UpdateCommand command = new UpdateCommand(session);
         command.setSessionID(sessionID);
         command.setAppData(appData);
-        command.setCallbackListener(listener);
-
-        callbackHandler.commandTimeout(command);
+        command.setListener(listener);
+        command.processTimeout();
 
         // Check
         assertTrue("Listener didn't receive a 'timeout' event",
-                listener.isTimeout);
+                listener.isUpdateTimeout);
+
+        assertFalse("Listener receive an invalid 'create timeout' event",
+                listener.isCreateTimeout);
 
         assertFalse("Listener receive an invalid 'update' event",
                 listener.isUpdate);
@@ -427,9 +421,9 @@ public class CallbackHandlerTest extends BaseTest {
         assertFalse("Listener received an invalid 'fail' event",
                 listener.isCreateFail);
 
-        assertEquals("Invalid AppData", appData, listener.timeoutAppData);
+        assertEquals("Invalid AppData", appData, listener.updateTimeoutAppData);
 
-        assertEquals("Invalid session ID", sessionID,
-                listener.timeoutSessionID);
+        assertEquals("Invalid session ID", session,
+                listener.updateTimeoutSession);
     }
 }

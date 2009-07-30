@@ -27,8 +27,6 @@ public class CommandTimeoutManagerMOCK extends CommandTimeoutManager {
     public void addPendingCommand(Command command) {
 
         // assert expected command atributes
-        assertNotNull("Command callback listener is null",
-                command.getCallbackListener());
         assertNotNull("Command listener is null", command.getListener());
         assertNotNull("Command cookie is null", command.getCookie());
         assertNotNull("Command session ID is null", command.getSessionID());

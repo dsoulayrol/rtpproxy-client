@@ -9,6 +9,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import org.vtlabs.rtpproxy.command.CommandTimeoutManager;
 import org.vtlabs.rtpproxy.callback.CallbackHandler;
 import org.vtlabs.rtpproxy.command.Command;
+import org.vtlabs.rtpproxy.command.CreateCommand;
 import org.vtlabs.rtpproxy.command.DestroyCommand;
 import org.vtlabs.rtpproxy.command.UpdateCommand;
 import org.vtlabs.rtpproxy.scheduler.RTPProxyScheduler;
@@ -22,6 +23,13 @@ import org.vtlabs.rtpproxy.udp.DatagramService;
  * @author Marcos Hack <marcosh@voicetechnology.com.br>
  */
 public class RTPProxyClient {
+
+    /* The fromtag and totag values didn't matter since they are the same in
+     * create and update commands to link the callee and caller session in the
+     * RTPProxy server.
+     */
+    private static final String DEFAULT_FROMTAG = "fromtag";
+    private static final String DEFAULT_TOTAG = "totag";
 
     protected CommandTimeoutManager commandTimeout;
     protected DatagramService udpService;
@@ -86,7 +94,7 @@ public class RTPProxyClient {
         createSession(sessionID, null, appData, listener);
     }
 
-     /**
+    /**
      * Asynchronously create a new session containing the Callee media address
      * pre-filling caller's address with the given 'callerAddress'. That way the
      * RTPProxy servers doesn't need to wait caller's RTP packets to arrive
@@ -109,28 +117,16 @@ public class RTPProxyClient {
 
         checkState();
 
-        UpdateCommand updateCmd = new UpdateCommand(callbackHandler);
-        updateCmd.setSessionID(sessionID);
-        updateCmd.setCallbackListener(listener);
-        updateCmd.setListener(callbackHandler);
-        updateCmd.setAppData(appData);
+        CreateCommand createCommand = new CreateCommand();
+        createCommand.setSessionID(sessionID);
+        createCommand.setListener(listener);
+        createCommand.setAppData(appData);
+        createCommand.setServer(scheduler.getNextServer());
+        createCommand.setPrefillingAddress(callerAddress);
+        createCommand.setFromTag(DEFAULT_FROMTAG);
 
-        // The fromtag and totag doesn't matter since they match that used in
-        // the updateSession() method below to link the callee and caller
-        // session in the RTPProxy.
-        updateCmd.setFromTag("fromtag");
-
-        if (callerAddress != null) {
-            updateCmd.setAddress(callerAddress);
-        }
-
-        // Get a server to handle the request and set it to the update command
-        RTPProxyServer server = scheduler.getNextServer();
-        updateCmd.setServer(server);
-
-        sendCommand(updateCmd, server.getAddress());
+        sendCommand(createCommand, createCommand.getServer().getAddress());
     }
-
 
     /**
      * Asynchronously update an existing session to create the Caller media
@@ -147,6 +143,7 @@ public class RTPProxyClient {
      */
     public void updateSession(RTPProxySession session, Object appData,
             RTPProxyClientListener listener) throws NoServerAvailableException {
+        
         updateSession(session, null, appData, listener);
     }
 
@@ -164,27 +161,25 @@ public class RTPProxyClient {
      *        (see {@link RTPProxyClientListener} for more information about
      *        callback methods).
      */
-    public void updateSession(RTPProxySession sessionIface,
+    public void updateSession(RTPProxySession session,
             InetSocketAddress calleeAddress,
             Object appData, RTPProxyClientListener listener)
             throws NoServerAvailableException {
 
         checkState();
 
-        RTPProxySessionImpl session = (RTPProxySessionImpl) sessionIface; 
-        UpdateCommand updateCmd = new UpdateCommand(session, callbackHandler);
-        updateCmd.setCallbackListener(listener);
+        UpdateCommand updateCmd = new UpdateCommand(session);
+        updateCmd.setListener(listener);
         updateCmd.setServer(session.getServer());
         updateCmd.setAppData(appData);
 
-        // The fromtag and totag doesn't matter since they match that used in
-        // the createSession() method above to link the callee and caller
-        // session in the RTPProxy.
-        updateCmd.setFromTag("totag");
-        updateCmd.setToTag("fromtag");
+        // Invert from/to is necessary to let RTPProxy server know we want to
+        // get the Caller media address with this command.
+        updateCmd.setFromTag(DEFAULT_TOTAG);
+        updateCmd.setToTag(DEFAULT_FROMTAG);
 
         if (calleeAddress != null) {
-            updateCmd.setAddress(calleeAddress);
+            updateCmd.setPrefillingAddress(calleeAddress);
         }
 
         sendCommand(updateCmd, session.getServer().getAddress());
@@ -206,15 +201,12 @@ public class RTPProxyClient {
 
         checkState();
 
-        RTPProxySessionImpl session = (RTPProxySessionImpl) sessionIface; 
-        DestroyCommand destroyCmd = new DestroyCommand(session, callbackHandler);
-        destroyCmd.setCallbackListener(listener);
+        RTPProxySessionImpl session = (RTPProxySessionImpl) sessionIface;
+        DestroyCommand destroyCmd = new DestroyCommand(session);
+        destroyCmd.setListener(listener);
         destroyCmd.setAppData(appData);
-
-        // The fromtag and totag doesn't matter since they match that used in
-        // the createSession() and updateSession() methods.
-        destroyCmd.setFromTag("fromtag");
-        destroyCmd.setToTag("totag");
+        destroyCmd.setFromTag(DEFAULT_FROMTAG);
+        destroyCmd.setToTag(DEFAULT_TOTAG);
 
         sendCommand(destroyCmd, session.getServer().getAddress());
     }
@@ -227,7 +219,6 @@ public class RTPProxyClient {
         commandTimeout.addPendingCommand(command);
         udpService.send(command.getMessage(), serverAddr);
     }
-
 
     /**
      * Get RTPProxyClient configuration.

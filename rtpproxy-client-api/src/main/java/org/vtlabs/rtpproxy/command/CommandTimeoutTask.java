@@ -29,7 +29,6 @@ public class CommandTimeoutTask implements Runnable {
             log.debug(sb.toString());
         }
 
-        CommandListener listener = command.getListener();
-        listener.commandTimeout(command);
+        command.processTimeout();
     }
 }

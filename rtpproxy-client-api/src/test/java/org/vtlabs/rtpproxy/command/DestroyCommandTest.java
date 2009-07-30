@@ -1,6 +1,7 @@
 package org.vtlabs.rtpproxy.command;
 
 import org.junit.Test;
+import org.vtlabs.rtpproxy.client.RTPProxySessionImpl;
 import static org.junit.Assert.*;
 
 /**
@@ -15,8 +16,10 @@ public class DestroyCommandTest {
         String fromTag = "from_tag";
         String toTag = "to_tag";
 
-        DestroyCommand cmd = new DestroyCommand(null);
-        cmd.setSessionID(sessionID);
+        RTPProxySessionImpl session = new RTPProxySessionImpl();
+        session.setSessionID(sessionID);
+
+        DestroyCommand cmd = new DestroyCommand(session);
         cmd.setFromTag(fromTag);
         cmd.setToTag(toTag);
 
