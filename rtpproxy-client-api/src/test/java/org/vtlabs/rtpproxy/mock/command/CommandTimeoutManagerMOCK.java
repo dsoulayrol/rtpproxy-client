@@ -6,14 +6,14 @@ package org.vtlabs.rtpproxy.mock.command;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import org.vtlabs.rtpproxy.command.Command;
-import org.vtlabs.rtpproxy.command.CommandTimeoutManager;
+import org.vtlabs.rtpproxy.timeout.TimeoutManager;
 import static org.junit.Assert.*;
 
 /**
  *
  * @author mhack
  */
-public class CommandTimeoutManagerMOCK extends CommandTimeoutManager {
+public class CommandTimeoutManagerMOCK extends TimeoutManager {
 
     public Command pendingCommand;
 
@@ -24,7 +24,7 @@ public class CommandTimeoutManagerMOCK extends CommandTimeoutManager {
     }
 
     @Override
-    public void addPendingCommand(Command command) {
+    public void addCommand(Command command) {
 
         // assert expected command atributes
         assertNotNull("Command listener is null", command.getListener());
@@ -35,7 +35,7 @@ public class CommandTimeoutManagerMOCK extends CommandTimeoutManager {
     }
 
     @Override
-    public Command removePendingCommand(String cookie) {
+    public Command removeCommand(String cookie) {
         return pendingCommand;
     }
 }

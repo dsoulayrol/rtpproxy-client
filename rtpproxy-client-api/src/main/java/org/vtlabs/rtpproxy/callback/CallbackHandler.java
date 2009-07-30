@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vtlabs.rtpproxy.command.Command;
-import org.vtlabs.rtpproxy.command.CommandTimeoutManager;
+import org.vtlabs.rtpproxy.timeout.TimeoutManager;
 import org.vtlabs.rtpproxy.udp.DatagramListener;
 
 /**
@@ -17,12 +17,12 @@ import org.vtlabs.rtpproxy.udp.DatagramListener;
  */
 public class CallbackHandler implements DatagramListener {
 
-    private CommandTimeoutManager commandManager;
+    private TimeoutManager commandManager;
     private Logger log = LoggerFactory.getLogger(CallbackHandler.class);
     private static Pattern errorPattern = Pattern.compile("^E(.*)$");
     private Matcher errorMatcher;
 
-    public CallbackHandler(CommandTimeoutManager commandManager) {
+    public CallbackHandler(TimeoutManager commandManager) {
         this.commandManager = commandManager;
         setupErrorMatcher();
     }
@@ -45,7 +45,7 @@ public class CallbackHandler implements DatagramListener {
             log.debug(sb.toString());
         }
 
-        Command command = commandManager.removePendingCommand(cookie);
+        Command command = commandManager.removeCommand(cookie);
 
         if (notError(message)) {
             command.processResponse(message);

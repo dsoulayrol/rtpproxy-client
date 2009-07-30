@@ -52,7 +52,7 @@ public class CallbackHandlerTest extends BaseTest {
         createCommand.setServer(server);
 
         // Finally add the command to the timeout manager
-        timeoutMngr.addPendingCommand(createCommand);
+        timeoutMngr.addCommand(createCommand);
 
         // Create a fake RTPProxy response message with the session port and IP
         // address
@@ -128,7 +128,7 @@ public class CallbackHandlerTest extends BaseTest {
         createCommand.setServer(server);
 
         // Finally add the command to the timeout manager
-        timeoutMngr.addPendingCommand(createCommand);
+        timeoutMngr.addCommand(createCommand);
 
         // Fake RTPProxy error message in the format /^E(.*)$/
         String message = "E3";
@@ -199,7 +199,7 @@ public class CallbackHandlerTest extends BaseTest {
         updateCommand.setServer(server);
 
         // Finally add the command to the timeout manager
-        timeoutMngr.addPendingCommand(updateCommand);
+        timeoutMngr.addCommand(updateCommand);
 
         // Create a fake RTPProxy response message with the session port and IP
         // address
@@ -284,7 +284,7 @@ public class CallbackHandlerTest extends BaseTest {
         updateCommand.setServer(server);
 
         // Finally add the command to the timeout manager
-        timeoutMngr.addPendingCommand(updateCommand);
+        timeoutMngr.addCommand(updateCommand);
 
         // Fake RTPProxy error response for the update command
         String message = "E3";
@@ -361,7 +361,7 @@ public class CallbackHandlerTest extends BaseTest {
         destroyCommand.setToTag(toTag);
 
         // Finally add the command to the timeout manager
-        timeoutMngr.addPendingCommand(destroyCommand);
+        timeoutMngr.addCommand(destroyCommand);
 
         // Create a fake RTPProxy response message with the session port and IP
         // address

@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import org.vtlabs.rtpproxy.command.CommandTimeoutManager;
+import org.vtlabs.rtpproxy.timeout.TimeoutManager;
 import org.vtlabs.rtpproxy.callback.CallbackHandler;
 import org.vtlabs.rtpproxy.command.Command;
 import org.vtlabs.rtpproxy.command.CreateCommand;
@@ -31,7 +31,7 @@ public class RTPProxyClient {
     private static final String DEFAULT_FROMTAG = "fromtag";
     private static final String DEFAULT_TOTAG = "totag";
 
-    protected CommandTimeoutManager commandTimeout;
+    protected TimeoutManager commandTimeout;
     protected DatagramService udpService;
     protected CallbackHandler callbackHandler;
     protected ScheduledThreadPoolExecutor executor;
@@ -216,7 +216,7 @@ public class RTPProxyClient {
      * given server address using the {@link DatagramService}.
      */
     protected void sendCommand(Command command, InetSocketAddress serverAddr) {
-        commandTimeout.addPendingCommand(command);
+        commandTimeout.addCommand(command);
         udpService.send(command.getMessage(), serverAddr);
     }
 
@@ -247,9 +247,9 @@ public class RTPProxyClient {
      *
      * @return
      */
-    protected CommandTimeoutManager createCommandTimeoutManager(
+    protected TimeoutManager createCommandTimeoutManager(
             ScheduledThreadPoolExecutor executor, long commandTimeout) {
-        return new CommandTimeoutManager(executor, commandTimeout);
+        return new TimeoutManager(executor, commandTimeout);
     }
 
     /**
@@ -268,7 +268,7 @@ public class RTPProxyClient {
      * @return
      */
     protected CallbackHandler createCallbackHandler(
-            CommandTimeoutManager commandManager) {
+            TimeoutManager commandManager) {
         return new CallbackHandler(commandManager);
     }
 

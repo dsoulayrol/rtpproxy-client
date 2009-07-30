@@ -3,8 +3,9 @@
  * and open the template in the editor.
  */
 
-package org.vtlabs.rtpproxy.command;
+package org.vtlabs.rtpproxy.timeout;
 
+import org.vtlabs.rtpproxy.command.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,12 +13,12 @@ import org.slf4j.LoggerFactory;
  *
  * @author mhack
  */
-public class CommandTimeoutTask implements Runnable {
+public class TimeoutTask implements Runnable {
     private Command command;
-    private CommandTimeoutManager manager;
-    private Logger log = LoggerFactory.getLogger(CommandTimeoutTask.class);
+    private TimeoutManager manager;
+    private Logger log = LoggerFactory.getLogger(TimeoutTask.class);
 
-    public CommandTimeoutTask(Command command, CommandTimeoutManager manager) {
+    public TimeoutTask(Command command, TimeoutManager manager) {
         this.command = command;
         this.manager = manager;
     }

@@ -13,7 +13,7 @@ import org.vtlabs.rtpproxy.command.Command;
 import org.vtlabs.rtpproxy.config.RTPProxyClientConfig;
 import org.vtlabs.rtpproxy.config.RTPProxyClientConfigException;
 import org.vtlabs.rtpproxy.config.RTPProxyClientConfigurator;
-import org.vtlabs.rtpproxy.command.CommandTimeoutManager;
+import org.vtlabs.rtpproxy.timeout.TimeoutManager;
 import org.vtlabs.rtpproxy.command.CreateCommand;
 import org.vtlabs.rtpproxy.command.DestroyCommand;
 import org.vtlabs.rtpproxy.command.UpdateCommand;
@@ -127,7 +127,7 @@ public class RTPProxyClientTest {
         }
 
         @Override
-        protected CommandTimeoutManager createCommandTimeoutManager(
+        protected TimeoutManager createCommandTimeoutManager(
                 ScheduledThreadPoolExecutor executor, long commandTimeout) {
 
             return new CommandTimeoutManagerMOCK(executor, commandTimeout);
