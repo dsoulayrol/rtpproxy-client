@@ -6,7 +6,7 @@
     <artifactId>rtpproxy-client</artifactId>
     <name>RTPProxy Client</name>
     <packaging>pom</packaging>
-    <version>0.2</version>
+    <version>0.3-SNAPSHOT</version>
 
     <description>Java client API to interact with RTPProxy.</description>
 
