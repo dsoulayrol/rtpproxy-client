@@ -18,7 +18,7 @@
         <dependency>
             <groupId>org.vtlabs</groupId>
             <artifactId>rtpproxy-client-api</artifactId>
-            <version>0.2</version>
+            <version>0.3-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
