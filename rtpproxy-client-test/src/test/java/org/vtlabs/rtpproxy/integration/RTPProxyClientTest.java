@@ -5,10 +5,8 @@ package org.vtlabs.rtpproxy.integration;
  * and open the template in the editor.
  */
 import java.util.UUID;
-import org.junit.BeforeClass;
+import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.vtlabs.rtpproxy.client.RTPProxyClient;
 import org.vtlabs.rtpproxy.client.RTPProxySessionState;
 import org.vtlabs.rtpproxy.config.RTPProxyClientConfig;
@@ -16,15 +14,16 @@ import org.vtlabs.rtpproxy.config.RTPProxyClientConfigurator;
 import org.vtlabs.rtpproxy.client.RTPProxyClientListener;
 import org.vtlabs.rtpproxy.client.RTPProxySession;
 import org.vtlabs.rtpproxy.exception.RTPProxyClientException;
+import org.vtlabs.rtpproxy.test.BaseTest;
 import static org.junit.Assert.*;
 
 /**
  *
  * @author mhack
  */
-public class RTPProxyClientTest implements RTPProxyClientListener {
+public class RTPProxyClientTest extends BaseTest
+        implements RTPProxyClientListener {
 
-    private static Logger log;
     private RTPProxyClient client;
     private RTPProxyClientConfig config;
     private RTPProxySession session;
@@ -36,12 +35,7 @@ public class RTPProxyClientTest implements RTPProxyClientListener {
     private boolean wasDestroyFailed;
     private boolean wasDestroyed;
 
-    @BeforeClass
-    public static void initClass() {
-        String configFile = "conf/log4j.properties";
-        System.setProperty("log4j.configuration", "file:" + configFile);
-        log = LoggerFactory.getLogger(RTPProxyClientTest.class);
-    }
+    private static Logger log = Logger.getLogger(RTPProxyClientTest.class);
 
     /**
      * Test the creation and subsequent destruction of a session using a
