@@ -1,4 +1,4 @@
-package org.vtlabs.rtpproxy.stress;
+package org.vtlabs.rtpproxy.test.stress;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +18,8 @@ import org.vtlabs.rtpproxy.test.BaseTest;
 public class StressTest extends BaseTest {
     private static final int DEFAULT_NUMBER_OF_THREADS = 10;
     private static final int DEFAULT_NUMBER_OF_TASKS   = 5;
-    private static final long DEFAULT_TASK_INTERVAL    = 500L;
-    private static final long DEFAULT_TEST_DURATION    = 10L;
+    private static final long DEFAULT_TASK_INTERVAL    = 500L; // ms
+    private static final long DEFAULT_TEST_DURATION    = 900L;  // sec
     private static final String DEFAULT_SERVER_LIST    = "127.0.0.1:22222";
 
     private static Logger log = Logger.getLogger(StressTest.class);
@@ -28,7 +28,7 @@ public class StressTest extends BaseTest {
     private long taskInterval;
     private long testDuration;
     private String serverList;
-    private Statistics stats;
+    private StressTestStatistics stats;
     private ScheduledThreadPoolExecutor executor;
     private RTPProxyClient client;
     private List<ScheduledFuture<StressTask>> tasks;
@@ -52,7 +52,8 @@ public class StressTest extends BaseTest {
             test.start();
             test.waitTestDuration();
             test.stop();
-            test.showTestResults();
+
+            System.out.print(StressTestResult.getTextResult(test.getStatistics()));
 
             log.info("Stress test sucessful terminated");
             System.exit(0);
@@ -69,7 +70,7 @@ public class StressTest extends BaseTest {
 
         RTPProxyClientConfig config = RTPProxyClientConfigurator.load(serverList);
         client = new RTPProxyClient(config);
-        stats = new Statistics();
+        stats = new StressTestStatistics();
         executor = new ScheduledThreadPoolExecutor(nThreads);
         stats.start();
         startTasks();
@@ -81,24 +82,8 @@ public class StressTest extends BaseTest {
         stopExecutor();
     }
 
-    public void showTestResults() {
-        StringBuilder sb = new StringBuilder("Stress Test Results:\n\t");
-        sb.append("create request(s): ");
-        sb.append(stats.getCreateRequestCounter()).append(" (");
-        sb.append(stats.getCreateSucessRate() * 100).append("% sucess, ");
-        sb.append(stats.getCreateFailRate() * 100).append("% fail, ");
-        sb.append(stats.getCreateTimeoutRate() * 100).append("% timeout)\n\t");
-        sb.append("update request(s): ");
-        sb.append(stats.getUpdateRequestCounter()).append(" (");
-        sb.append(stats.getUpdateSucessRate() * 100).append("% sucess, ");
-        sb.append(stats.getUpdateFailRate() * 100).append("% fail, ");
-        sb.append(stats.getUpdateTimeoutRate() * 100).append("% timeout)\n\t");
-        sb.append("destroy request(s): ");
-        sb.append(stats.getDestroyRequestCounter()).append(" (");
-        sb.append(stats.getDestroySucessRate() * 100).append("% sucess, ");
-        sb.append(stats.getDestroyFailRate() * 100).append("% fail, ");
-        sb.append(stats.getDestroyTimeoutRate() * 100).append("% timeout)\n\t");
-        System.out.print(sb);
+    public StressTestStatistics getStatistics() {
+        return stats;
     }
 
     public void setTaskNumber(int nTasks) {
@@ -156,7 +141,10 @@ public class StressTest extends BaseTest {
     }
 
     /**
-     * Number of sessions created per second.
+     * Calculate the of number of sessions created per second using the current
+     * test configuration.
+     *
+     * @return number of sessions/sec
      */
     private double getStressRate() {
         double result = (1000 / taskInterval) * nTasks;

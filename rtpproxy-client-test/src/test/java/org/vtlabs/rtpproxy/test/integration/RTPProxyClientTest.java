@@ -1,4 +1,4 @@
-package org.vtlabs.rtpproxy.integration;
+package org.vtlabs.rtpproxy.test.integration;
 
 /*
  * To change this template, choose Tools | Templates

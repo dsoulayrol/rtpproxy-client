@@ -1,4 +1,4 @@
-package org.vtlabs.rtpproxy.stress;
+package org.vtlabs.rtpproxy.test.stress;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author marcoshack
  */
-public class Statistics {
+public class StressTestStatistics {
     private Date startTime;
     private Date endTime;
     private AtomicLong createRequestCounter;
@@ -24,7 +24,7 @@ public class Statistics {
     private AtomicLong destroyTimeoutCounter;
     private AtomicLong updateTimeoutCounter;
 
-    public Statistics() {
+    public StressTestStatistics() {
         createRequestCounter = new AtomicLong(0L);
         destroyRequestCounter = new AtomicLong(0L);
         updateRequestCounter = new AtomicLong(0L);
@@ -208,7 +208,7 @@ public class Statistics {
 
     private double getRate(AtomicLong share, AtomicLong divisor) {
         if (divisor.get() > 0) {
-            return share.get() / divisor.get();
+            return (double) share.get() / divisor.get();
         } else {
             return 0L;
         }

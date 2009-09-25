@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.vtlabs.rtpproxy.stress;
+package org.vtlabs.rtpproxy.test.stress;
 
 import java.util.UUID;
 import org.apache.log4j.Logger;
@@ -17,11 +17,11 @@ import org.vtlabs.rtpproxy.client.RTPProxySession;
  */
 public class StressTask implements Runnable, RTPProxyClientListener {
     private RTPProxyClient client;
-    private Statistics stats;
+    private StressTestStatistics stats;
     private int taskID;
     private static Logger log = Logger.getLogger(StressTask.class);
 
-    public StressTask(RTPProxyClient client, Statistics stats, int taskID) {
+    public StressTask(RTPProxyClient client, StressTestStatistics stats, int taskID) {
         this.client = client;
         this.stats = stats;
         this.taskID = taskID;
