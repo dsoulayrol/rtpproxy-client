@@ -12,6 +12,7 @@ import org.vtlabs.rtpproxy.callback.CallbackHandler;
 import org.vtlabs.rtpproxy.command.Command;
 import org.vtlabs.rtpproxy.command.CreateCommand;
 import org.vtlabs.rtpproxy.command.DestroyCommand;
+import org.vtlabs.rtpproxy.command.RecordCommand;
 import org.vtlabs.rtpproxy.command.UpdateCommand;
 import org.vtlabs.rtpproxy.exception.RTPProxyClientException;
 import org.vtlabs.rtpproxy.scheduler.RTPProxyScheduler;
@@ -109,6 +110,41 @@ public class RTPProxyClient {
         createCommand.setFromTag(DEFAULT_FROMTAG);
 
         sendCommand(createCommand, createCommand.getServer().getAddress());
+    }
+
+    /**
+     * Asynchronously asks the RTPProxy record a particular session
+     * 
+     * @param sessionID
+     *            String to be used as session ID.
+     * @param appData
+     *            Application data object, will be passed as argument in the
+     *            callback method, it isn't used internally.
+     * @param listener
+     *            that will receive the callback events for this command. (see
+     *            {@link RTPProxyClientListener} for more information about
+     *            callback methods).
+     * @param isOwner
+     * 
+     * @throws RTPProxyClientException
+     */
+    public void recordSession(String sessionID, Object appData, RTPProxyClientListener listener, String fileName, boolean isOwner) throws RTPProxyClientException {
+	RecordCommand command = new RecordCommand();
+	command.setSessionID(sessionID);
+	command.setAppData(appData);
+	command.setListener(listener);
+	command.setServer(scheduler.getNextServer());
+	command.setFileName(fileName);
+
+	if (isOwner) {
+	    command.setFromTag(DEFAULT_FROMTAG);
+	    command.setToTag(DEFAULT_TOTAG);
+	} else {
+	    command.setFromTag(DEFAULT_TOTAG);
+	    command.setToTag(DEFAULT_FROMTAG);
+	}
+
+	sendCommand(command, command.getServer().getAddress());
     }
 
     /**

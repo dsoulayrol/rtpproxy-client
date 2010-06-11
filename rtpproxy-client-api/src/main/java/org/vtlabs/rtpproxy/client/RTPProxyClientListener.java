@@ -14,4 +14,8 @@ public interface RTPProxyClientListener {
     public void updateSessionFailed(RTPProxySession session, Object appData, Throwable t);
     public void destroySessionTimeout(RTPProxySession session, Object appData);
     public void destroySessionFailed(RTPProxySession session, Object appData, Throwable t);
+    public void recordableSessionCreated(String sessionID, Object appData);
+    public void createRecordableSessionTimeout(String sessionID, Object appData);
+    public void createRecordableSessionFailed(String sessionID, Object appData);
+    
 }
