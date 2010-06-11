@@ -284,7 +284,7 @@ public class RTPProxyClientTest implements RTPProxyClientListener {
 		wakeup();
 	}
 
-	public void createRecordableSession(String sessionID, Object appData) {
+	public void recordableSessionCreated(String sessionID, Object appData) {
 		wasSessionRecordableCreate = true;
 		wakeup();
 
