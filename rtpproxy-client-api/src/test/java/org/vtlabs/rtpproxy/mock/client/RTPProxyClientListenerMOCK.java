@@ -43,13 +43,13 @@ public class RTPProxyClientListenerMOCK implements RTPProxyClientListener {
 	public Object destroyAppData;
 	public boolean isRecordableCreateTimeout;
 	public String createRecordableTimeoutSessionID;
-	public String createRecordableTimeoutAppData;
+	public Object createRecordableTimeoutAppData;
 	public boolean isRecordableCreateFail;
 	public String createRecordableFailedSessionID;
-	public String createRecordableFailedAppData;
+	public Object createRecordableFailedAppData;
 	public boolean isRecordableCreate;
 	public String createdRecordableSession;
-	public String createdRecordableAppData;
+	public Object createdRecordableAppData;
 	
 
 	public void createSessionTimeout(String sessionID, Object appData) {
