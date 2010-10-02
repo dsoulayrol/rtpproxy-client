@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.UUID;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ import org.vtlabs.rtpproxy.exception.RTPProxyClientException;
  * 
  * @author mhack
  */
+@Ignore
 public class RTPProxyClientTest implements RTPProxyClientListener {
 
 	private static Logger log;
@@ -56,15 +58,6 @@ public class RTPProxyClientTest implements RTPProxyClientListener {
 		String configFile = "conf/log4j.properties";
 		System.setProperty("log4j.configuration", "file:" + configFile);
 		log = LoggerFactory.getLogger(RTPProxyClientTest.class);
-
-		/*
-		 * Insertion of "conf/env.properties" in this project. This file
-		 * contains informations about the RTPProxy machine (directories,
-		 * filenames, ip, etc.)
-		 * 
-		 * @author Rodrigo Ribeiro
-		 */
-
 		File configurations = new File("conf/env.properties");
 		environment = new Properties();
 		FileInputStream fis = null;
