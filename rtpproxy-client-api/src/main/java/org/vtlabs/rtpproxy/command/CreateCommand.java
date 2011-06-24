@@ -1,10 +1,10 @@
 package org.vtlabs.rtpproxy.command;
 
 import java.net.InetSocketAddress;
+
 import org.apache.commons.lang.StringUtils;
 import org.vtlabs.rtpproxy.client.RTPProxyClient;
 import org.vtlabs.rtpproxy.client.RTPProxyServer;
-import org.vtlabs.rtpproxy.exception.RTPProxyClientException;
 import org.vtlabs.rtpproxy.client.RTPProxySessionImpl;
 import org.vtlabs.rtpproxy.client.RTPProxySessionState;
 
@@ -13,7 +13,7 @@ import org.vtlabs.rtpproxy.client.RTPProxySessionState;
  *
  * @author Marcos Hack <marcosh@voicetechnology.com.br>
  */
-public class CreateCommand extends Command {
+public class CreateCommand extends ParameterizedCommand {
 
     protected InetSocketAddress prefillingAddress;
 
@@ -35,8 +35,11 @@ public class CreateCommand extends Command {
     @Override
     public String getMessage() {
         StringBuilder sb = new StringBuilder(getCookie());
-        sb.append(" U ");
-        sb.append(getSessionID());
+        sb.append(" U");
+        String parameters = getParameters();
+        if (parameters != null)
+            sb.append(parameters);
+        sb.append(" ").append(getSessionID());
 
         String strAddress;
         int port;
