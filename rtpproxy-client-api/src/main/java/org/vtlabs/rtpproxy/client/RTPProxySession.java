@@ -12,6 +12,8 @@ public interface RTPProxySession {
 
 	public String getSessionID();
 
+	public String getOriginalCallerTag();
+
 	public RTPProxySessionState getState();
 	
 	public boolean isActive();
