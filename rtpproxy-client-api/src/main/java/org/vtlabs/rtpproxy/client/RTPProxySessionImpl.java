@@ -8,7 +8,6 @@ import java.net.InetSocketAddress;
  */
 public class RTPProxySessionImpl implements RTPProxySession {
     private String sessionID;
-    private String callerTag;
     private InetSocketAddress callerMediaAddress;
     private InetSocketAddress calleeMediaAddress;
     private RTPProxyServer server;
@@ -45,15 +44,7 @@ public class RTPProxySessionImpl implements RTPProxySession {
     public void setSessionID(String sessionID) {
         this.sessionID = sessionID;
     }
-
-    public String getOriginalCallerTag() {
-        return callerTag;
-    }
-
-    public void setOriginalCallerTag(String tag) {
-        this.callerTag = tag;
-    }
-
+    
     public RTPProxySessionState getState() {
 		return state;
 	}
@@ -70,7 +61,6 @@ public class RTPProxySessionImpl implements RTPProxySession {
     public String toString() {
         StringBuilder sb = new StringBuilder("RTPProxySession[");
         sb.append("sessionID = ").append(sessionID);
-        sb.append("initiator tag = ").append(callerTag);
         sb.append(", calleeMediaAddress = ").append(calleeMediaAddress);
         sb.append(", callerMediaAddress = ").append(callerMediaAddress);
         sb.append(", server = ").append(server);
